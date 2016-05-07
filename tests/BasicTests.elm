@@ -51,6 +51,8 @@ textTests =
             <| assertEqualPair (emptyTextDecoded, textTagTypeFromString emptyText)
         , test "non empty strings are non empty results"
             <| assertEqualPair (nonEmptyText, textFromHtml nonEmptyText)
+        , test "non strings are decoded to non text tags"
+            <| assertEqualPair (nonEmptyTextDecoded, textTagTypeFromString nonEmptyText)
         ]
 
 allTests : Test
