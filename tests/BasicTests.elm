@@ -8,6 +8,8 @@ import Json.Decode
 
 -- DATA
 
+-- Empty things
+
 -- { type = \"text\", text = \"\" }"
 emptyText : String
 emptyText =
@@ -19,6 +21,21 @@ emptyTextDecoded =
 
 
 
+emptyDiv : Html.Html msg
+emptyDiv =
+    Html.div [] []
+
+emptyDivAsString : String
+emptyDivAsString =
+    "<div></div>"
+
+emptyDivDecoded : NodeType
+emptyDivDecoded =
+    NodeEntry { tag = "div" }
+
+
+-- Non empty things!
+
 nonEmptyText : String
 nonEmptyText =
     ("hello")
@@ -26,6 +43,7 @@ nonEmptyText =
 nonEmptyTextDecoded : NodeType
 nonEmptyTextDecoded =
     TextTag { text = nonEmptyText }
+
 
 
 -- HELPERS
@@ -55,10 +73,21 @@ textTests =
             <| assertEqualPair (nonEmptyTextDecoded, textTagTypeFromString nonEmptyText)
         ]
 
+nodeTests : Test
+nodeTests =
+    suite "Node tests"
+        [ test "empty divs are empty divs as a string"
+            <| assertEqualPair (emptyDivAsString, htmlToString emptyDiv)
+        , test "empty divs are decoded to empty div nodes"
+            <| assertEqualPair (emptyTextDecoded, nodeTypeFromHtml emptyDiv)
+        ]
+
 allTests : Test
 allTests =
     suite "Html rendering"
-        [ textTests ]
+        [ textTests
+        , nodeTests
+        ]
 
 main : Program Never
 main =
