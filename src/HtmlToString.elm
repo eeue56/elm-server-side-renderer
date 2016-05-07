@@ -3,6 +3,7 @@ module HtmlToString exposing (..) -- where
 import Html exposing (Html)
 import Json.Decode exposing ((:=))
 import String
+import Dict exposing (Dict)
 import Helpers exposing (..)
 
 type NodeType
@@ -16,7 +17,7 @@ type alias TextTagRecord =
 type alias NodeRecord =
     { tag : String
     , children : List NodeType
-    --, facts : List String
+    , facts : Dict String String
     --, namespace : String
     , descendantsCount : Int
     }
@@ -41,9 +42,10 @@ decodeTextTag =
 
 decodeNode : Json.Decode.Decoder NodeRecord
 decodeNode =
-    Json.Decode.object3 NodeRecord
+    Json.Decode.object4 NodeRecord
         ( "tag" := Json.Decode.string )
         ( "children" := Json.Decode.list decodeNodeType)
+        ( "facts" := Json.Decode.dict Json.Decode.string)
         ( "descendantsCount" := Json.Decode.int )
 
 
@@ -55,10 +57,10 @@ nodeTypeFromHtml =
 
 
 nodeRecordToString : NodeRecord -> String
-nodeRecordToString {tag, children} =
+nodeRecordToString {tag, children, facts} =
     let
         openTag =
-            "<" ++ tag ++ ">"
+            "<" ++ tag ++ classes ++ ">"
 
         closeTag =
             "</" ++ tag ++ ">"
@@ -66,6 +68,10 @@ nodeRecordToString {tag, children} =
         childrenStrings =
             List.map nodeTypeToString children
                 |> String.join ""
+        classes =
+            Dict.get "className" facts
+                |> Maybe.map (\name -> " class=\"" ++ name ++ "\"")
+                |> Maybe.withDefault ""
     in
         String.join ""
             [ openTag

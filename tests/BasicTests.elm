@@ -3,7 +3,9 @@ module BasicTests exposing (..) -- where
 import HtmlToString exposing (..)
 import ElmTest exposing (..)
 import Html
+import Html.Attributes
 import Json.Decode
+import Dict
 
 
 -- DATA
@@ -31,7 +33,31 @@ emptyDivAsString =
 
 emptyDivDecoded : NodeType
 emptyDivDecoded =
-    NodeEntry { tag = "div", children = [], descendantsCount = 0 }
+    NodeEntry
+        { tag = "div"
+        , children = []
+        , descendantsCount = 0
+        , facts = Dict.empty
+        }
+
+
+emptyDivWithAttribute : Html.Html msg
+emptyDivWithAttribute =
+    Html.div [ Html.Attributes.class "dog" ] []
+
+emptyDivWithAttributeAsString : String
+emptyDivWithAttributeAsString =
+    "<div class=\"dog\"></div>"
+
+emptyDivWithAttributeDecoded : NodeType
+emptyDivWithAttributeDecoded =
+    NodeEntry
+        { tag = "div"
+        , children = []
+        , descendantsCount = 0
+        , facts = Dict.fromList
+            [ ("className", "dog") ]
+        }
 
 
 -- Non empty things!
@@ -55,7 +81,12 @@ oneChildDivAsString =
 
 oneChildDivDecoded : NodeType
 oneChildDivDecoded =
-    NodeEntry { tag = "div", children = [ nonEmptyTextDecoded ], descendantsCount = 1 }
+    NodeEntry
+        { tag = "div"
+        , children = [ nonEmptyTextDecoded ]
+        , descendantsCount = 1
+        , facts = Dict.empty
+        }
 
 oneChildSpan : Html.Html msg
 oneChildSpan =
@@ -67,7 +98,12 @@ oneChildSpanAsString =
 
 oneChildSpanDecoded : NodeType
 oneChildSpanDecoded =
-    NodeEntry { tag = "span", children = [ nonEmptyTextDecoded ], descendantsCount = 1 }
+    NodeEntry
+        { tag = "span"
+        , children = [ nonEmptyTextDecoded ]
+        , descendantsCount = 1
+        , facts = Dict.empty
+        }
 
 
 twoChildForm : Html.Html msg
@@ -88,7 +124,6 @@ countDescendents nodeType =
         _ ->
             0
 
-
 twoChildFormDecoded : NodeType
 twoChildFormDecoded =
     let
@@ -101,6 +136,7 @@ twoChildFormDecoded =
             { tag = "form"
             , children = children
             , descendantsCount = 4
+            , facts = Dict.empty
             }
 
 
@@ -138,6 +174,11 @@ nodeTests =
             <| assertEqualPair (emptyDivAsString, htmlToString emptyDiv)
         , test "empty divs are decoded to empty div nodes"
             <| assertEqualPair (emptyDivDecoded, nodeTypeFromHtml emptyDiv)
+
+        , test "empty divs with classes get classes as a string"
+            <| assertEqualPair (emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute)
+        , test "empty divs with classes are decoded to empty div nodes with classes"
+            <| assertEqualPair (emptyDivWithAttributeDecoded, nodeTypeFromHtml emptyDivWithAttribute)
 
         , test "divs with one non-empty text node are just a div with text"
             <| assertEqualPair (oneChildDivAsString, htmlToString oneChildDiv)
