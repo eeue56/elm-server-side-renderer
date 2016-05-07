@@ -31,7 +31,7 @@ emptyDivAsString =
 
 emptyDivDecoded : NodeType
 emptyDivDecoded =
-    NodeEntry { tag = "div" }
+    NodeEntry { tag = "div", children = [] }
 
 
 -- Non empty things!
@@ -43,6 +43,19 @@ nonEmptyText =
 nonEmptyTextDecoded : NodeType
 nonEmptyTextDecoded =
     TextTag { text = nonEmptyText }
+
+
+oneChildDiv : Html.Html msg
+oneChildDiv =
+    Html.div [] [ Html.text nonEmptyText ]
+
+oneChildDivAsString : String
+oneChildDivAsString =
+    "<div>" ++ nonEmptyText ++ "</div>"
+
+oneChildDivDecoded : NodeType
+oneChildDivDecoded =
+    NodeEntry { tag = "div", children = [ nonEmptyTextDecoded ] }
 
 
 
@@ -79,7 +92,11 @@ nodeTests =
         [ test "empty divs are empty divs as a string"
             <| assertEqualPair (emptyDivAsString, htmlToString emptyDiv)
         , test "empty divs are decoded to empty div nodes"
-            <| assertEqualPair (emptyTextDecoded, nodeTypeFromHtml emptyDiv)
+            <| assertEqualPair (emptyDivDecoded, nodeTypeFromHtml emptyDiv)
+        , test "divs with one non-empty text node are just a div with text"
+            <| assertEqualPair (oneChildDivAsString, htmlToString oneChildDiv)
+        , test "divs with one non-empty text node are decoded to just a div with text"
+            <| assertEqualPair (oneChildDivDecoded, nodeTypeFromHtml oneChildDiv)
         ]
 
 allTests : Test
@@ -91,4 +108,4 @@ allTests =
 
 main : Program Never
 main =
-    runSuite textTests
+    runSuite allTests

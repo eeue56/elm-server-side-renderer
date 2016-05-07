@@ -15,45 +15,42 @@ type alias TextTagRecord =
 
 type alias NodeRecord =
     { tag : String
+    , children : List NodeType
     --, facts : List String
-    --, children : NodeType
     --, namespace : String
     --, descendantsCount : Int
     }
 
-
-decodeNodeType : (String -> Result String NodeType) -> Json.Decode.Decoder NodeType
-decodeNodeType typeFromString =
-    ( "type" := Json.Decode.customDecoder Json.Decode.string (typeFromString))
+decodeNodeType : Json.Decode.Decoder NodeType
+decodeNodeType =
+    ( "type" := Json.Decode.string )
+        |> (flip Json.Decode.andThen)
+            (\typeString ->
+                case typeString of
+                    "text" ->
+                        Json.Decode.map TextTag (decodeTextTag)
+                    "node" ->
+                        Json.Decode.map NodeEntry (decodeNode)
+                    _ ->
+                        Json.Decode.fail ("No such type as " ++ typeString)
+            )
 
 decodeTextTag : Json.Decode.Decoder TextTagRecord
 decodeTextTag =
-    ( "ext" := Json.Decode.customDecoder Json.Decode.string (\text -> Ok { text = text }))
+    ( "text" := Json.Decode.customDecoder Json.Decode.string (\text -> Ok { text = text }))
 
 decodeNode : Json.Decode.Decoder NodeRecord
 decodeNode =
-    Json.Decode.object1 NodeRecord
+    Json.Decode.object2 NodeRecord
         ( "tag" := Json.Decode.string )
-
-
-typeFromString : String -> String -> Result String NodeType
-typeFromString stuff type' =
-    case type' of
-        "text" ->
-            Result.map TextTag (Json.Decode.decodeString decodeTextTag stuff)
-        "node" ->
-            Result.map NodeEntry (Json.Decode.decodeString decodeNode stuff)
-        _ ->
-            Err <| "No such type as " ++ type'
+        ( "children" := Json.Decode.list decodeNodeType)
 
 
 nodeTypeFromHtml : Html msg -> NodeType
 nodeTypeFromHtml =
-    toString
-        >> String.split "="
-        >> String.join ":"
-        >> wrapFieldsWithQuotes
-        >> (\x -> Json.Decode.decodeString (decodeNodeType (typeFromString x)) x)
+    stringify
+        >> Json.Decode.decodeString decodeNodeType
+        >> Debug.log "decoderd:"
         >> Result.withDefault NoOp
 
 htmlToString : Html msg -> String
