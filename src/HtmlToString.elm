@@ -65,7 +65,7 @@ nodeRecordToString {tag, children} =
 
         childrenStrings =
             List.map nodeTypeToString children
-                |> String.join "\n"
+                |> String.join ""
     in
         String.join ""
             [ openTag

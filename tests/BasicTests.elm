@@ -57,6 +57,51 @@ oneChildDivDecoded : NodeType
 oneChildDivDecoded =
     NodeEntry { tag = "div", children = [ nonEmptyTextDecoded ], descendantsCount = 1 }
 
+oneChildSpan : Html.Html msg
+oneChildSpan =
+    Html.span [] [ Html.text nonEmptyText ]
+
+oneChildSpanAsString : String
+oneChildSpanAsString =
+    "<span>" ++ nonEmptyText ++ "</span>"
+
+oneChildSpanDecoded : NodeType
+oneChildSpanDecoded =
+    NodeEntry { tag = "span", children = [ nonEmptyTextDecoded ], descendantsCount = 1 }
+
+
+twoChildForm : Html.Html msg
+twoChildForm =
+    Html.form [] [ oneChildDiv, oneChildSpan ]
+
+twoChildFormAsString : String
+twoChildFormAsString =
+    "<form>" ++ oneChildDivAsString ++ oneChildSpanAsString ++ "</form>"
+
+countDescendents : NodeType -> Int
+countDescendents nodeType =
+    case nodeType of
+        NodeEntry {descendantsCount} ->
+            descendantsCount
+        TextTag _ ->
+            1
+        _ ->
+            0
+
+
+twoChildFormDecoded : NodeType
+twoChildFormDecoded =
+    let
+        children =
+            [ oneChildDivDecoded
+            , oneChildSpanDecoded
+            ]
+    in
+        NodeEntry
+            { tag = "form"
+            , children = children
+            , descendantsCount = 4
+            }
 
 
 -- HELPERS
@@ -93,10 +138,22 @@ nodeTests =
             <| assertEqualPair (emptyDivAsString, htmlToString emptyDiv)
         , test "empty divs are decoded to empty div nodes"
             <| assertEqualPair (emptyDivDecoded, nodeTypeFromHtml emptyDiv)
+
         , test "divs with one non-empty text node are just a div with text"
             <| assertEqualPair (oneChildDivAsString, htmlToString oneChildDiv)
         , test "divs with one non-empty text node are decoded to just a div with text"
             <| assertEqualPair (oneChildDivDecoded, nodeTypeFromHtml oneChildDiv)
+
+        , test "spans with one non-empty text node are just a span with text"
+            <| assertEqualPair (oneChildSpanAsString, htmlToString oneChildSpan)
+        , test "spans with one non-empty text node are decoded to just a span with text"
+            <| assertEqualPair (oneChildSpanDecoded, nodeTypeFromHtml oneChildSpan)
+
+
+        , test "forms with two non-empty text children are just a form with text"
+            <| assertEqualPair (twoChildFormAsString, htmlToString twoChildForm)
+        , test "forms with two non-empty text children are decoded to just a form with text"
+            <| assertEqualPair (twoChildFormDecoded, nodeTypeFromHtml twoChildForm)
         ]
 
 allTests : Test
