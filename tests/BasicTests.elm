@@ -31,7 +31,7 @@ emptyDivAsString =
 
 emptyDivDecoded : NodeType
 emptyDivDecoded =
-    NodeEntry { tag = "div", children = [] }
+    NodeEntry { tag = "div", children = [], descendantsCount = 0 }
 
 
 -- Non empty things!
@@ -55,7 +55,7 @@ oneChildDivAsString =
 
 oneChildDivDecoded : NodeType
 oneChildDivDecoded =
-    NodeEntry { tag = "div", children = [ nonEmptyTextDecoded ] }
+    NodeEntry { tag = "div", children = [ nonEmptyTextDecoded ], descendantsCount = 1 }
 
 
 

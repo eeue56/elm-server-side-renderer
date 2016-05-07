@@ -18,7 +18,7 @@ type alias NodeRecord =
     , children : List NodeType
     --, facts : List String
     --, namespace : String
-    --, descendantsCount : Int
+    , descendantsCount : Int
     }
 
 decodeNodeType : Json.Decode.Decoder NodeType
@@ -41,31 +41,49 @@ decodeTextTag =
 
 decodeNode : Json.Decode.Decoder NodeRecord
 decodeNode =
-    Json.Decode.object2 NodeRecord
+    Json.Decode.object3 NodeRecord
         ( "tag" := Json.Decode.string )
         ( "children" := Json.Decode.list decodeNodeType)
+        ( "descendantsCount" := Json.Decode.int )
 
 
 nodeTypeFromHtml : Html msg -> NodeType
 nodeTypeFromHtml =
     stringify
         >> Json.Decode.decodeString decodeNodeType
-        >> Debug.log "decoderd:"
         >> Result.withDefault NoOp
 
-htmlToString : Html msg -> String
-htmlToString node =
-    case nodeTypeFromHtml node of
+
+nodeRecordToString : NodeRecord -> String
+nodeRecordToString {tag, children} =
+    let
+        openTag =
+            "<" ++ tag ++ ">"
+
+        closeTag =
+            "</" ++ tag ++ ">"
+
+        childrenStrings =
+            List.map nodeTypeToString children
+                |> String.join "\n"
+    in
+        String.join ""
+            [ openTag
+            , childrenStrings
+            , closeTag
+            ]
+
+nodeTypeToString : NodeType -> String
+nodeTypeToString nodeType =
+    case nodeType of
         TextTag {text} ->
             text
-        NodeEntry {tag} ->
-            String.join ""
-                [ "<"
-                , tag
-                , ">"
-                , "</"
-                , tag
-                , ">"
-                ]
+        NodeEntry record ->
+            nodeRecordToString record
         NoOp ->
             ""
+
+
+htmlToString : Html msg -> String
+htmlToString  =
+    nodeTypeFromHtml >> nodeTypeToString
