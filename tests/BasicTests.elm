@@ -12,10 +12,9 @@ import Dict
 
 -- Empty things
 
--- { type = \"text\", text = \"\" }"
 emptyText : String
 emptyText =
-    ("")
+    ""
 
 emptyTextDecoded : NodeType
 emptyTextDecoded =
@@ -41,6 +40,7 @@ emptyDivDecoded =
         }
 
 
+
 emptyDivWithAttribute : Html.Html msg
 emptyDivWithAttribute =
     Html.div [ Html.Attributes.class "dog" ] []
@@ -61,6 +61,8 @@ emptyDivWithAttributeDecoded =
                 Dict.fromList [ ("className", "dog") ]
             }
         }
+
+
 
 emptyDivWithStyle : Html.Html msg
 emptyDivWithStyle =
@@ -88,11 +90,12 @@ emptyDivWithStyleDecoded =
 
 nonEmptyText : String
 nonEmptyText =
-    ("hello")
+    "hello"
 
 nonEmptyTextDecoded : NodeType
 nonEmptyTextDecoded =
     TextTag { text = nonEmptyText }
+
 
 
 oneChildDiv : Html.Html msg
@@ -112,6 +115,8 @@ oneChildDivDecoded =
         , facts = emptyFacts
         }
 
+
+
 oneChildSpan : Html.Html msg
 oneChildSpan =
     Html.span [] [ Html.text nonEmptyText ]
@@ -128,6 +133,7 @@ oneChildSpanDecoded =
         , descendantsCount = 1
         , facts = emptyFacts
         }
+
 
 
 twoChildForm : Html.Html msg
@@ -152,6 +158,7 @@ twoChildFormDecoded =
             , descendantsCount = 4
             , facts = emptyFacts
             }
+
 
 
 -- HELPERS
