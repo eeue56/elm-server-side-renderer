@@ -59,6 +59,24 @@ emptyDivWithAttributeDecoded =
             [ ("className", "dog") ]
         }
 
+emptyDivWithStyle : Html.Html msg
+emptyDivWithStyle =
+    Html.div [ Html.Attributes.style [("color", "red")] ] []
+
+emptyDivWithStyleAsString : String
+emptyDivWithStyleAsString =
+    "<div style=\"color:red\"></div>"
+
+emptyDivWithStyleDecoded : NodeType
+emptyDivWithStyleDecoded =
+    NodeEntry
+        { tag = "div"
+        , children = []
+        , descendantsCount = 0
+        , facts = Dict.fromList
+            [ ("color", "red") ]
+        }
+
 
 -- Non empty things!
 
@@ -114,16 +132,6 @@ twoChildFormAsString : String
 twoChildFormAsString =
     "<form>" ++ oneChildDivAsString ++ oneChildSpanAsString ++ "</form>"
 
-countDescendents : NodeType -> Int
-countDescendents nodeType =
-    case nodeType of
-        NodeEntry {descendantsCount} ->
-            descendantsCount
-        TextTag _ ->
-            1
-        _ ->
-            0
-
 twoChildFormDecoded : NodeType
 twoChildFormDecoded =
     let
@@ -154,6 +162,18 @@ assertEqualPair : (a, a) -> Assertion
 assertEqualPair (left, right) =
     assertEqual left right
 
+countDescendents : NodeType -> Int
+countDescendents nodeType =
+    case nodeType of
+        NodeEntry {descendantsCount} ->
+            descendantsCount
+        TextTag _ ->
+            1
+        _ ->
+            0
+
+-- TESTS
+
 textTests : Test
 textTests =
     suite "Text tests"
@@ -179,6 +199,13 @@ nodeTests =
             <| assertEqualPair (emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute)
         , test "empty divs with classes are decoded to empty div nodes with classes"
             <| assertEqualPair (emptyDivWithAttributeDecoded, nodeTypeFromHtml emptyDivWithAttribute)
+
+        , test "empty divs with styles get styles as a string"
+            <| assertEqualPair (emptyDivWithStyleAsString, htmlToString emptyDivWithStyle)
+        , test "empty divs with styles are decoded to empty div nodes with styles"
+            <| assertEqualPair (emptyDivWithStyleDecoded, nodeTypeFromHtml emptyDivWithStyle)
+
+
 
         , test "divs with one non-empty text node are just a div with text"
             <| assertEqualPair (oneChildDivAsString, htmlToString oneChildDiv)
