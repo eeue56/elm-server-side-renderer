@@ -17,10 +17,26 @@ type alias TextTagRecord =
 type alias NodeRecord =
     { tag : String
     , children : List NodeType
-    , facts : Dict String String
+    , facts : Facts
     --, namespace : String
     , descendantsCount : Int
     }
+
+type alias Facts =
+    { styles : Dict String String
+    , events : Json.Decode.Value
+    , attributes : Json.Decode.Value
+    , attributeNamespace : Json.Decode.Value
+    , others : Dict String String
+    }
+
+styleKey : String
+styleKey = "STYLE"
+eventKey = "EVENT"
+attributeKey = "ATTR"
+attributeNamespaceKey = "ATTR_NS"
+
+knownKeys = [ styleKey, eventKey, attributeKey, attributeNamespaceKey ]
 
 decodeNodeType : Json.Decode.Decoder NodeType
 decodeNodeType =
@@ -45,13 +61,50 @@ decodeNode =
     Json.Decode.object4 NodeRecord
         ( "tag" := Json.Decode.string )
         ( "children" := Json.Decode.list decodeNodeType)
-        ( "facts" := Json.Decode.dict Json.Decode.string)
+        ( "facts" := decodeFacts)
         ( "descendantsCount" := Json.Decode.int )
+
+decodeStyles : Json.Decode.Decoder (Dict String String)
+decodeStyles =
+    Json.Decode.dict Json.Decode.string
+
+filterKnownKeys : Dict String a -> Dict String a
+filterKnownKeys =
+    Dict.filter (\key _ -> List.member key knownKeys)
+
+
+decodeOthers : Json.Decode.Decoder (Dict String String)
+decodeOthers =
+    Json.Decode.customDecoder
+        (Json.Decode.dict Json.Decode.value)
+        (filterKnownKeys
+            >> Dict.toList
+            >> List.filterMap (\(key, value) ->
+                case Json.Decode.decodeValue Json.Decode.string value of
+                    Err _ ->
+                        Nothing
+                    Ok v ->
+                        Just (key, v)
+                )
+            >> Dict.fromList
+            >> Ok
+        )
+
+decodeFacts : Json.Decode.Decoder Facts
+decodeFacts =
+    Json.Decode.object5 Facts
+        ( styleKey := decodeStyles )
+        ( eventKey := Json.Decode.value )
+        ( attributeKey := Json.Decode.value )
+        ( attributeNamespaceKey := Json.Decode.value )
+        ( decodeOthers )
+
 
 
 nodeTypeFromHtml : Html msg -> NodeType
 nodeTypeFromHtml =
     stringify
+        >> Debug.log "hm"
         >> Json.Decode.decodeString decodeNodeType
         >> Result.withDefault NoOp
 
@@ -68,10 +121,12 @@ nodeRecordToString {tag, children, facts} =
         childrenStrings =
             List.map nodeTypeToString children
                 |> String.join ""
+
         classes =
-            Dict.get "className" facts
+            Dict.get "className" facts.others
                 |> Maybe.map (\name -> " class=\"" ++ name ++ "\"")
                 |> Maybe.withDefault ""
+
     in
         String.join ""
             [ openTag
