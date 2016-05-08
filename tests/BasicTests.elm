@@ -37,7 +37,7 @@ emptyDivDecoded =
         { tag = "div"
         , children = []
         , descendantsCount = 0
-        , facts = Dict.empty
+        , facts = emptyFacts
         }
 
 
@@ -55,8 +55,11 @@ emptyDivWithAttributeDecoded =
         { tag = "div"
         , children = []
         , descendantsCount = 0
-        , facts = Dict.fromList
-            [ ("className", "dog") ]
+        , facts =
+            { emptyFacts
+            | others =
+                Dict.fromList [ ("className", "dog") ]
+            }
         }
 
 emptyDivWithStyle : Html.Html msg
@@ -73,8 +76,11 @@ emptyDivWithStyleDecoded =
         { tag = "div"
         , children = []
         , descendantsCount = 0
-        , facts = Dict.fromList
-            [ ("color", "red") ]
+        , facts =
+            { emptyFacts
+            | styles =
+                Dict.fromList [ ("color", "red") ]
+            }
         }
 
 
@@ -103,7 +109,7 @@ oneChildDivDecoded =
         { tag = "div"
         , children = [ nonEmptyTextDecoded ]
         , descendantsCount = 1
-        , facts = Dict.empty
+        , facts = emptyFacts
         }
 
 oneChildSpan : Html.Html msg
@@ -120,7 +126,7 @@ oneChildSpanDecoded =
         { tag = "span"
         , children = [ nonEmptyTextDecoded ]
         , descendantsCount = 1
-        , facts = Dict.empty
+        , facts = emptyFacts
         }
 
 
@@ -144,7 +150,7 @@ twoChildFormDecoded =
             { tag = "form"
             , children = children
             , descendantsCount = 4
-            , facts = Dict.empty
+            , facts = emptyFacts
             }
 
 

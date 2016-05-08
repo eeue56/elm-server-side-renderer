@@ -1,6 +1,7 @@
 module HtmlToString exposing (..) -- where
 
 import Html exposing (Html)
+import Json.Encode
 import Json.Decode exposing ((:=))
 import String
 import Dict exposing (Dict)
@@ -24,10 +25,19 @@ type alias NodeRecord =
 
 type alias Facts =
     { styles : Dict String String
-    , events : Json.Decode.Value
-    , attributes : Json.Decode.Value
-    , attributeNamespace : Json.Decode.Value
+    , events : Maybe Json.Decode.Value
+    , attributes : Maybe Json.Decode.Value
+    , attributeNamespace : Maybe Json.Decode.Value
     , others : Dict String String
+    }
+
+emptyFacts : Facts
+emptyFacts =
+    { styles = Dict.empty
+    , events = Nothing
+    , attributes = Nothing
+    , attributeNamespace = Nothing
+    , others = Dict.empty
     }
 
 styleKey : String
@@ -93,10 +103,10 @@ decodeOthers =
 decodeFacts : Json.Decode.Decoder Facts
 decodeFacts =
     Json.Decode.object5 Facts
-        ( styleKey := decodeStyles )
-        ( eventKey := Json.Decode.value )
-        ( attributeKey := Json.Decode.value )
-        ( attributeNamespaceKey := Json.Decode.value )
+        ( Json.Decode.oneOf [ ( styleKey := decodeStyles ) , Json.Decode.succeed Dict.empty ] )
+        ( Json.Decode.maybe ( eventKey :=  Json.Decode.value ) )
+        ( Json.Decode.maybe ( attributeKey := Json.Decode.value ) )
+        ( Json.Decode.maybe ( attributeNamespaceKey := Json.Decode.value ) )
         ( decodeOthers )
 
 
