@@ -80,7 +80,7 @@ decodeStyles =
 
 filterKnownKeys : Dict String a -> Dict String a
 filterKnownKeys =
-    Dict.filter (\key _ -> List.member key knownKeys)
+    Dict.filter (\key _ -> not (List.member key knownKeys))
 
 
 decodeOthers : Json.Decode.Decoder (Dict String String)
@@ -114,7 +114,6 @@ decodeFacts =
 nodeTypeFromHtml : Html msg -> NodeType
 nodeTypeFromHtml =
     stringify
-        >> Debug.log "hm"
         >> Json.Decode.decodeString decodeNodeType
         >> Result.withDefault NoOp
 
@@ -122,8 +121,21 @@ nodeTypeFromHtml =
 nodeRecordToString : NodeRecord -> String
 nodeRecordToString {tag, children, facts} =
     let
-        openTag =
-            "<" ++ tag ++ classes ++ ">"
+        openTag : List (Maybe String) -> String
+        openTag extras =
+            let
+                trimmedExtras =
+                    List.filterMap (\x -> x) extras
+                        |> List.map String.trim
+                        |> List.filter ((==) "")
+
+                filling =
+                    case trimmedExtras of
+                        [] -> ""
+                        more ->
+                            " " ++ (String.join " " more)
+            in
+                "<" ++ tag ++ filling ++ ">"
 
         closeTag =
             "</" ++ tag ++ ">"
@@ -132,14 +144,23 @@ nodeRecordToString {tag, children, facts} =
             List.map nodeTypeToString children
                 |> String.join ""
 
+        styles =
+            case Dict.toList facts.styles of
+                [] -> Nothing
+                styles ->
+                    styles
+                        |> List.map (\(key, value) -> key ++ ":" ++ value)
+                        |> String.join ""
+                        |> (\styleString -> "style=\"" ++ styleString ++ "\"")
+                        |> Just
+
         classes =
             Dict.get "className" facts.others
-                |> Maybe.map (\name -> " class=\"" ++ name ++ "\"")
-                |> Maybe.withDefault ""
+                |> Maybe.map (\name -> "class=\"" ++ name ++ "\"")
 
     in
         String.join ""
-            [ openTag
+            [ openTag [ classes, styles ]
             , childrenStrings
             , closeTag
             ]
