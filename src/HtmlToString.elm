@@ -1,10 +1,12 @@
 module HtmlToString exposing (..) -- where
 
 import Html exposing (Html)
-import Json.Encode
+
 import Json.Decode exposing ((:=))
 import String
 import Dict exposing (Dict)
+
+import Constants exposing (..)
 import Helpers exposing (..)
 
 type NodeType
@@ -40,14 +42,6 @@ emptyFacts =
     , others = Dict.empty
     }
 
-styleKey : String
-styleKey = "STYLE"
-eventKey = "EVENT"
-attributeKey = "ATTR"
-attributeNamespaceKey = "ATTR_NS"
-
-knownKeys = [ styleKey, eventKey, attributeKey, attributeNamespaceKey ]
-
 decodeNodeType : Json.Decode.Decoder NodeType
 decodeNodeType =
     ( "type" := Json.Decode.string )
@@ -76,12 +70,10 @@ decodeNode =
 
 decodeStyles : Json.Decode.Decoder (Dict String String)
 decodeStyles =
-    Json.Decode.dict Json.Decode.string
-
-filterKnownKeys : Dict String a -> Dict String a
-filterKnownKeys =
-    Dict.filter (\key _ -> not (List.member key knownKeys))
-
+    Json.Decode.oneOf
+        [ ( styleKey := Json.Decode.dict Json.Decode.string )
+        , Json.Decode.succeed Dict.empty
+        ]
 
 decodeOthers : Json.Decode.Decoder (Dict String String)
 decodeOthers =
@@ -103,21 +95,25 @@ decodeOthers =
 decodeFacts : Json.Decode.Decoder Facts
 decodeFacts =
     Json.Decode.object5 Facts
-        ( Json.Decode.oneOf [ ( styleKey := decodeStyles ) , Json.Decode.succeed Dict.empty ] )
+        ( decodeStyles )
         ( Json.Decode.maybe ( eventKey :=  Json.Decode.value ) )
         ( Json.Decode.maybe ( attributeKey := Json.Decode.value ) )
         ( Json.Decode.maybe ( attributeNamespaceKey := Json.Decode.value ) )
         ( decodeOthers )
 
-
-
+{-| Convert a generic Html msg to a given NodeType. If we fail to parse,
+fall back on a NoOp node type.
+-}
 nodeTypeFromHtml : Html msg -> NodeType
 nodeTypeFromHtml =
     stringify
         >> Json.Decode.decodeString decodeNodeType
         >> Result.withDefault NoOp
 
-
+{-| Convert a node record to a string. This basically takes the tag name, then
+    pulls all the facts into tag declaration, then goes through the children and
+    nests them undert hsi one
+-}
 nodeRecordToString : NodeRecord -> String
 nodeRecordToString {tag, children, facts} =
     let
@@ -165,6 +161,8 @@ nodeRecordToString {tag, children, facts} =
             , closeTag
             ]
 
+{-| Convert a given html node to a string based on the type
+-}
 nodeTypeToString : NodeType -> String
 nodeTypeToString nodeType =
     case nodeType of
@@ -175,7 +173,9 @@ nodeTypeToString nodeType =
         NoOp ->
             ""
 
-
+{-| Take a Html element, convert it to a string
+Useful for tests
+-}
 htmlToString : Html msg -> String
 htmlToString  =
     nodeTypeFromHtml >> nodeTypeToString

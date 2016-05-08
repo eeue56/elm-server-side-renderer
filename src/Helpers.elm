@@ -2,15 +2,28 @@ module Helpers exposing (..) -- where
 
 import String
 import Regex
+import Constants exposing (..)
+import Dict exposing (Dict)
+
 import Native.Helpers
+
 
 
 stringify : a -> String
 stringify =
     Native.Helpers.stringify
 
-wrapper : String -> String -> String
-wrapper left right =
+
+filterKnownKeys : Dict String a -> Dict String a
+filterKnownKeys =
+    Dict.filter (\key _ -> not (List.member key knownKeys))
+
+
+-- UNUSED
+-- Hacky text approach
+
+wrapWithQuotesAndColons : String -> String -> String
+wrapWithQuotesAndColons left right =
     "\"" ++ (String.trim left) ++ "\"" ++ ":" ++ right
 
 replaceInternalStructure : String -> String
@@ -28,12 +41,13 @@ wrapFieldsWithQuotes =
             case parts of
                 left::right::_ ->
                     if String.startsWith "{" left then
-                        "{" ++ (wrapper (String.dropLeft 1 left) right)
+                        "{" ++ (wrapWithQuotesAndColons (String.dropLeft 1 left) right)
                     else
-                        wrapper left right
+                        wrapWithQuotesAndColons left right
                 _ ->
                     String.join ":" parts
     in
         String.split ","
             >> List.map (String.split ":" >> Debug.log "parts" >> rejoiner)
             >> String.join ","
+
