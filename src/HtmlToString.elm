@@ -127,7 +127,7 @@ nodeRecordToString {tag, children, facts} =
                 trimmedExtras =
                     List.filterMap (\x -> x) extras
                         |> List.map String.trim
-                        |> List.filter ((==) "")
+                        |> List.filter ((/=) "")
 
                 filling =
                     case trimmedExtras of
