@@ -2,36 +2,14 @@ module HtmlToString exposing (..) -- where
 
 import Html exposing (Html)
 
-import Json.Decode exposing ((:=))
 import String
 import Dict exposing (Dict)
+import Json.Decode
 
 import Constants exposing (..)
 import Helpers exposing (..)
+import InternalTypes exposing (..)
 
-type NodeType
-    = TextTag TextTagRecord
-    | NodeEntry NodeRecord
-    | NoOp
-
-type alias TextTagRecord =
-    { text : String }
-
-type alias NodeRecord =
-    { tag : String
-    , children : List NodeType
-    , facts : Facts
-    --, namespace : String
-    , descendantsCount : Int
-    }
-
-type alias Facts =
-    { styles : Dict String String
-    , events : Maybe Json.Decode.Value
-    , attributes : Maybe Json.Decode.Value
-    , attributeNamespace : Maybe Json.Decode.Value
-    , others : Dict String String
-    }
 
 emptyFacts : Facts
 emptyFacts =
@@ -42,64 +20,6 @@ emptyFacts =
     , others = Dict.empty
     }
 
-decodeNodeType : Json.Decode.Decoder NodeType
-decodeNodeType =
-    ( "type" := Json.Decode.string )
-        |> (flip Json.Decode.andThen)
-            (\typeString ->
-                case typeString of
-                    "text" ->
-                        Json.Decode.map TextTag (decodeTextTag)
-                    "node" ->
-                        Json.Decode.map NodeEntry (decodeNode)
-                    _ ->
-                        Json.Decode.fail ("No such type as " ++ typeString)
-            )
-
-decodeTextTag : Json.Decode.Decoder TextTagRecord
-decodeTextTag =
-    ( "text" := Json.Decode.customDecoder Json.Decode.string (\text -> Ok { text = text }))
-
-decodeNode : Json.Decode.Decoder NodeRecord
-decodeNode =
-    Json.Decode.object4 NodeRecord
-        ( "tag" := Json.Decode.string )
-        ( "children" := Json.Decode.list decodeNodeType)
-        ( "facts" := decodeFacts)
-        ( "descendantsCount" := Json.Decode.int )
-
-decodeStyles : Json.Decode.Decoder (Dict String String)
-decodeStyles =
-    Json.Decode.oneOf
-        [ ( styleKey := Json.Decode.dict Json.Decode.string )
-        , Json.Decode.succeed Dict.empty
-        ]
-
-decodeOthers : Json.Decode.Decoder (Dict String String)
-decodeOthers =
-    Json.Decode.customDecoder
-        (Json.Decode.dict Json.Decode.value)
-        (filterKnownKeys
-            >> Dict.toList
-            >> List.filterMap (\(key, value) ->
-                case Json.Decode.decodeValue Json.Decode.string value of
-                    Err _ ->
-                        Nothing
-                    Ok v ->
-                        Just (key, v)
-                )
-            >> Dict.fromList
-            >> Ok
-        )
-
-decodeFacts : Json.Decode.Decoder Facts
-decodeFacts =
-    Json.Decode.object5 Facts
-        ( decodeStyles )
-        ( Json.Decode.maybe ( eventKey :=  Json.Decode.value ) )
-        ( Json.Decode.maybe ( attributeKey := Json.Decode.value ) )
-        ( Json.Decode.maybe ( attributeNamespaceKey := Json.Decode.value ) )
-        ( decodeOthers )
 
 {-| Convert a generic Html msg to a given NodeType. If we fail to parse,
 fall back on a NoOp node type.
@@ -154,9 +74,16 @@ nodeRecordToString {tag, children, facts} =
             Dict.get "className" facts.others
                 |> Maybe.map (\name -> "class=\"" ++ name ++ "\"")
 
+        others =
+            Dict.filter (\k v -> k /= "className") facts.others
+                |> Dict.toList
+                |> List.map (\(k, v) -> k ++ "=\"" ++ v ++ "\"")
+                |> String.join " "
+                |> Just
+
     in
         String.join ""
-            [ openTag [ classes, styles ]
+            [ openTag [ classes, styles, others ]
             , childrenStrings
             , closeTag
             ]

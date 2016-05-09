@@ -1,11 +1,13 @@
 module BasicTests exposing (..) -- where
 
 import HtmlToString exposing (..)
+import InternalTypes exposing (..)
+
 import ElmTest exposing (..)
 import Html
 import Html.Attributes
-import Json.Decode
 import Dict
+import String
 
 
 -- DATA
@@ -59,6 +61,41 @@ emptyDivWithAttributeDecoded =
             { emptyFacts
             | others =
                 Dict.fromList [ ("className", "dog") ]
+            }
+        }
+
+
+
+emptyDivWithManyAttributes : Html.Html msg
+emptyDivWithManyAttributes =
+    Html.div
+        [ Html.Attributes.class "dog"
+        , Html.Attributes.value "cat"
+        , Html.Attributes.width 50
+        ]
+        []
+
+emptyDivWithManyAttributesAsString : String
+emptyDivWithManyAttributesAsString =
+    String.trim """
+<div class="dog" value="cat" width="50"></div>
+    """
+
+
+emptyDivWithManyAttributesDecoded : NodeType
+emptyDivWithManyAttributesDecoded =
+    NodeEntry
+        { tag = "div"
+        , children = []
+        , descendantsCount = 0
+        , facts =
+            { emptyFacts
+            | others =
+                Dict.fromList
+                    [ ("className", "dog")
+                    , ("value", "cat")
+                    , ("width", "50")
+                    ]
             }
         }
 
@@ -212,6 +249,11 @@ nodeTests =
             <| assertEqualPair (emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute)
         , test "empty divs with classes are decoded to empty div nodes with classes"
             <| assertEqualPair (emptyDivWithAttributeDecoded, nodeTypeFromHtml emptyDivWithAttribute)
+
+        , test "empty divs with many attributes get attributes as a string"
+            <| assertEqualPair (emptyDivWithManyAttributesAsString, htmlToString emptyDivWithManyAttributes)
+        , test "empty divs with many attributes are decoded to empty div nodes with attributes"
+            <| assertEqualPair (emptyDivWithManyAttributesDecoded, nodeTypeFromHtml emptyDivWithManyAttributes)
 
         , test "empty divs with styles get styles as a string"
             <| assertEqualPair (emptyDivWithStyleAsString, htmlToString emptyDivWithStyle)
