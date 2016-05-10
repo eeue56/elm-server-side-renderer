@@ -59,7 +59,7 @@ emptyDivWithAttributeDecoded =
         , descendantsCount = 0
         , facts =
             { emptyFacts
-            | others =
+            | stringOthers =
                 Dict.fromList [ ("className", "dog") ]
             }
         }
@@ -90,7 +90,7 @@ emptyDivWithManyAttributesDecoded =
         , descendantsCount = 0
         , facts =
             { emptyFacts
-            | others =
+            | stringOthers =
                 Dict.fromList
                     [ ("className", "dog")
                     , ("value", "cat")

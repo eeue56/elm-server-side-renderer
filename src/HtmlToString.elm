@@ -17,7 +17,8 @@ emptyFacts =
     , events = Nothing
     , attributes = Nothing
     , attributeNamespace = Nothing
-    , others = Dict.empty
+    , stringOthers = Dict.empty
+    , boolOthers = Dict.empty
     }
 
 
@@ -71,19 +72,25 @@ nodeRecordToString {tag, children, facts} =
                         |> Just
 
         classes =
-            Dict.get "className" facts.others
+            Dict.get "className" facts.stringOthers
                 |> Maybe.map (\name -> "class=\"" ++ name ++ "\"")
 
-        others =
-            Dict.filter (\k v -> k /= "className") facts.others
+        stringOthers =
+            Dict.filter (\k v -> k /= "className") facts.stringOthers
                 |> Dict.toList
                 |> List.map (\(k, v) -> k ++ "=\"" ++ v ++ "\"")
                 |> String.join " "
                 |> Just
 
+        boolOthers =
+            Dict.toList facts.boolOthers
+                |> List.map (\(k, v) -> k ++ "=" ++ (String.toLower <| toString v))
+                |> String.join " "
+                |> Just
+
     in
         String.join ""
-            [ openTag [ classes, styles, others ]
+            [ openTag [ classes, styles, stringOthers, boolOthers ]
             , childrenStrings
             , closeTag
             ]
