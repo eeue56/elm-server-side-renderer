@@ -10,6 +10,7 @@ import Html.Attributes
 import Html.Events
 import Dict
 import String
+import Json.Encode
 
 
 -- DATA
@@ -43,6 +44,31 @@ emptyDivDecoded =
         , facts = emptyFacts
         }
 
+
+emptyDivWithClick : Html.Html String
+emptyDivWithClick =
+    Html.div
+        [ Html.Events.onClick ("hello")
+        , Html.Events.onInput (\x -> x)
+        ]
+        []
+
+
+inputText =
+    Json.Encode.object
+        [ ( "target",
+            Json.Encode.object
+                [ ( "value", Json.Encode.string "hello")]
+          )
+        ]
+
+
+stuff : String
+stuff =
+    emptyDivWithClick
+        |> triggerEvent "input" inputText
+        |> Debug.log "event"
+        |> Result.withDefault ""
 
 
 emptyDivWithAddedAttribute : Html.Html String

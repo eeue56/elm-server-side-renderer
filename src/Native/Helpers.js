@@ -84,10 +84,23 @@ function replaceChildren(nodeString){
     return JSON.stringify(newChildren);
 }
 
+function triggerEvent(eventName, value, node){
+    var facts = node.facts;
+    var events = facts['EVENT'];
+
+    if (typeof events === "undefined" || events === null
+        || typeof events[eventName] === "undefined" || events[eventName] === null){
+        _elm_lang$core$Result$Err("Event " + eventName + " not found");
+    }
+
+    return A2(_elm_lang$core$Native_Json.run, events[eventName].decoder, value)
+}
+
 return {
     replaceChildren: replaceChildren,
     stringify: JSON.stringify,
-    addAttribute: F2(addAttribute)
+    addAttribute: F2(addAttribute),
+    triggerEvent: F3(triggerEvent)
 };
 
 }();
