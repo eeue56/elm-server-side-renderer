@@ -2,10 +2,12 @@ module BasicTests exposing (..) -- where
 
 import HtmlToString exposing (..)
 import InternalTypes exposing (..)
+import Helpers exposing (..)
 
 import ElmTest exposing (..)
 import Html
 import Html.Attributes
+import Html.Events
 import Dict
 import String
 
@@ -43,6 +45,31 @@ emptyDivDecoded =
 
 
 
+emptyDivWithAddedAttribute : Html.Html String
+emptyDivWithAddedAttribute =
+    Html.div [] []
+        |> addAttribute (Html.Attributes.class "dog")
+
+emptyDivWithAddedAttributeAsString : String
+emptyDivWithAddedAttributeAsString =
+    "<div class=\"dog\"></div>"
+
+emptyDivWithAddedAttributeDecoded : NodeType
+emptyDivWithAddedAttributeDecoded =
+    NodeEntry
+        { tag = "div"
+        , children = []
+        , descendantsCount = 0
+        , facts =
+            { emptyFacts
+            | stringOthers =
+                Dict.fromList [ ("className", "dog") ]
+            }
+        }
+
+
+
+
 emptyDivWithAttribute : Html.Html msg
 emptyDivWithAttribute =
     Html.div [ Html.Attributes.class "dog" ] []
@@ -68,12 +95,16 @@ emptyDivWithAttributeDecoded =
 
 emptyDivWithManyAttributes : Html.Html msg
 emptyDivWithManyAttributes =
-    Html.div
-        [ Html.Attributes.class "dog"
-        , Html.Attributes.value "cat"
-        , Html.Attributes.width 50
-        ]
-        []
+    --Html.div
+    --    [ Html.Attributes.class "dog"
+    --    , Html.Attributes.value "cat"
+    --    , Html.Attributes.width 50
+    --    ]
+        --[]
+    emptyDiv
+        |> addAttribute (Html.Attributes.class "dog")
+        |> addAttribute (Html.Attributes.value "cat")
+        |> addAttribute (Html.Attributes.width 50)
 
 emptyDivWithManyAttributesAsString : String
 emptyDivWithManyAttributesAsString =
@@ -244,6 +275,11 @@ nodeTests =
             <| assertEqualPair (emptyDivAsString, htmlToString emptyDiv)
         , test "empty divs are decoded to empty div nodes"
             <| assertEqualPair (emptyDivDecoded, nodeTypeFromHtml emptyDiv)
+
+        , test "empty divs are empty divs as a string"
+            <| assertEqualPair (emptyDivWithAddedAttributeAsString, htmlToString emptyDivWithAddedAttribute)
+        , test "empty divs are decoded to empty div nodes"
+            <| assertEqualPair (emptyDivWithAddedAttributeDecoded, nodeTypeFromHtml emptyDivWithAddedAttribute)
 
         , test "empty divs with classes get classes as a string"
             <| assertEqualPair (emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute)

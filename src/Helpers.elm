@@ -5,7 +5,19 @@ import Regex
 import Constants exposing (..)
 import Dict exposing (Dict)
 
+import Html
 import Native.Helpers
+
+
+
+nativeAddThings : Html.Attribute msg -> Html.Html msg -> Html.Html msg
+nativeAddThings =
+    Native.Helpers.addAttribute
+
+
+addAttribute : Html.Attribute msg -> Html.Html msg -> Html.Html msg
+addAttribute attribute htmlThing =
+    nativeAddThings attribute htmlThing
 
 
 

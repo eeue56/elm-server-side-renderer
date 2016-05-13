@@ -67,6 +67,15 @@ decodeNode =
         ( "facts" := decodeFacts)
         ( "descendantsCount" := Json.Decode.int )
 
+encodeNodeRecord : NodeRecord -> Json.Encode.Value
+encodeNodeRecord record =
+    Json.Encode.object
+        [ ( "tag", Json.Encode.string record.tag)
+        --, ( "children", Json.Encode.list encodeNodeType)
+        --, ( "facts", encodeFacts)
+        , ( "descendantsCount", Json.Encode.int record.descendantsCount)
+        ]
+
 decodeStyles : Json.Decode.Decoder (Dict String String)
 decodeStyles =
     Json.Decode.oneOf
@@ -112,3 +121,5 @@ decodeFacts =
         ( Json.Decode.maybe ( attributeNamespaceKey := Json.Decode.value ) )
         ( decodeOthers Json.Decode.string )
         ( decodeOthers Json.Decode.bool )
+
+
