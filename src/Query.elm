@@ -3,6 +3,7 @@ module Query
         ( query
         , queryById
         , queryByClassname
+        , queryByClassList
         , queryByTagname
         , queryByAttribute
         , queryInNode
@@ -21,6 +22,7 @@ import String
 type Selector
     = Id String
     | Classname String
+    | ClassList (List String)
     | Tag String
     | Attribute String String
 
@@ -44,6 +46,13 @@ queryById id =
 queryByClassname : String -> Html msg -> List NodeType
 queryByClassname classname =
     query (Classname classname)
+
+
+{-| Query for a node with all the given classnames in a Html element
+-}
+queryByClassList : List String -> Html msg -> List NodeType
+queryByClassList classList =
+    query (ClassList classList)
 
 
 {-| Query for a node with a given attribute in a Html element
@@ -91,6 +100,9 @@ predicateFromSelector selector =
         Classname classname ->
             hasClass classname
 
+        ClassList classList ->
+            hasClasses classList
+
         Tag tag ->
             (==) tag << .tag
 
@@ -109,8 +121,24 @@ hasAttribute attribute query { facts } =
 
 
 hasClass : String -> NodeRecord -> Bool
-hasClass query { facts } =
+hasClass query record =
+    List.member query (classnames record)
+
+
+hasClasses : List String -> NodeRecord -> Bool
+hasClasses classList record =
+    containsAll classList (classnames record)
+
+
+classnames : NodeRecord -> List String
+classnames { facts } =
     Dict.get "className" facts.stringOthers
         |> Maybe.withDefault ""
         |> String.split " "
-        |> List.member query
+
+
+containsAll : List a -> List a -> Bool
+containsAll a b =
+    b
+        |> List.foldl (\i acc -> List.filter ((/=) i) acc) a
+        |> List.isEmpty

@@ -373,7 +373,7 @@ queryTests =
             Html.p [ Html.Attributes.class "foo my-class" ] []
 
         p3 =
-            Html.p [ Html.Attributes.class "foo bar" ] []
+            Html.p [ Html.Attributes.class "foo bar moo" ] []
     in
         suite "Query tests"
             [ test "query by tagname returns an empty list if no matches"
@@ -419,6 +419,16 @@ queryTests =
                 <| assertEqualPair
                     ( [ emptyDivWithManyAttributesDecoded ]
                     , queryByAttribute "width" "50" (Html.div [] [ p1, emptyDivWithManyAttributes, p3 ])
+                    )
+            , test "query by classlist returns an empty list if no matches"
+                <| assertEqualPair
+                    ( []
+                    , queryByClassList [ "foo", "nope" ] (Html.div [] [ p1, p2, p3 ])
+                    )
+            , test "query by classlist finds all nodes"
+                <| assertEqualPair
+                    ( [ nodeTypeFromHtml p3 ]
+                    , queryByClassList [ "foo", "moo" ] (Html.div [] [ p1, p2, p3 ])
                     )
             ]
 
