@@ -1,4 +1,13 @@
-module Query exposing (..)
+module Query
+    exposing
+        ( query
+        , queryById
+        , queryByClassname
+        , queryByTagname
+        , queryByAttribute
+        , queryInNode
+        , Selector(..)
+        )
 
 import Html exposing (Html)
 import HtmlToString exposing (nodeTypeFromHtml)
@@ -7,39 +16,64 @@ import Dict
 import String
 
 
-{-| Query for a node with a given tag in a Html node
+{-| Selectors to query a Html element
 -}
-queryTagnameInNode : String -> NodeType -> List NodeType
-queryTagnameInNode tagname node =
-    let
-        mapChildren children =
-            List.concatMap (queryTagnameInNode tagname) children
-    in
-        case node of
-            NodeEntry record ->
-                if record.tag == tagname then
-                    [ node ] ++ (mapChildren record.children)
-                else
-                    mapChildren record.children
-
-            _ ->
-                []
+type Selector
+    = Id String
+    | Classname String
+    | Tag String
+    | Attribute String String
 
 
-{-| Query for a node with a given Fact in a Html node
+{-| Query for a node with a given tag in a Html element
 -}
-queryFactInNode : (Facts -> Bool) -> String -> NodeType -> List NodeType
-queryFactInNode predicate query node =
+queryByTagname : String -> Html msg -> List NodeType
+queryByTagname tagname =
+    query (Tag tagname)
+
+
+{-| Query for a node with a given id in a Html element
+-}
+queryById : String -> Html msg -> List NodeType
+queryById id =
+    query (Id id)
+
+
+{-| Query for a node with a given classname in a Html element
+-}
+queryByClassname : String -> Html msg -> List NodeType
+queryByClassname classname =
+    query (Classname classname)
+
+
+{-| Query for a node with a given attribute in a Html element
+-}
+queryByAttribute : String -> String -> Html msg -> List NodeType
+queryByAttribute key value =
+    query (Attribute key value)
+
+
+{-| Query a Html element using a selector
+-}
+query : Selector -> Html msg -> List NodeType
+query selector =
+    nodeTypeFromHtml >> queryInNode selector
+
+
+{-| Query a Html node using a selector
+-}
+queryInNode : Selector -> NodeType -> List NodeType
+queryInNode selector node =
     case node of
         NodeEntry record ->
             let
                 mapChildren children =
-                    List.concatMap (queryFactInNode predicate query) children
+                    List.concatMap (queryInNode selector) children
 
-                found =
-                    predicate record.facts
+                predicate =
+                    predicateFromSelector selector
             in
-                if found then
+                if predicate record then
                     [ node ] ++ (mapChildren record.children)
                 else
                     mapChildren record.children
@@ -48,63 +82,35 @@ queryFactInNode predicate query node =
             []
 
 
-{-| Query for a node with a given classname in a Html node
--}
-queryClassInNode : String -> NodeType -> List NodeType
-queryClassInNode query node =
-    let
-        predicate { stringOthers } =
-            Dict.get "className" stringOthers
-                |> Maybe.withDefault ""
-                |> String.split " "
-                |> List.member query
-    in
-        queryFactInNode predicate query node
+predicateFromSelector : Selector -> (NodeRecord -> Bool)
+predicateFromSelector selector =
+    case selector of
+        Id id ->
+            hasAttribute "id" id
+
+        Classname classname ->
+            hasClass classname
+
+        Tag tag ->
+            (==) tag << .tag
+
+        Attribute key value ->
+            hasAttribute key value
 
 
-{-| Query for a node with a given id in a Html node
--}
-queryIdInNode : String -> NodeType -> List NodeType
-queryIdInNode query node =
-    let
-        predicate { stringOthers } =
-            case Dict.get "id" stringOthers of
-                Just id ->
-                    id == query
+hasAttribute : String -> String -> NodeRecord -> Bool
+hasAttribute attribute query { facts } =
+    case Dict.get attribute facts.stringOthers of
+        Just id ->
+            id == query
 
-                Nothing ->
-                    False
-    in
-        queryFactInNode predicate query node
+        Nothing ->
+            False
 
 
-{-| Helper for query functions
--}
-queryByHtml : (String -> NodeType -> List NodeType) -> String -> Html msg -> List NodeType
-queryByHtml queryFn query html =
-    let
-        node =
-            nodeTypeFromHtml html
-    in
-        queryFn query node
-
-
-{-| Query for a node with a given tag in a Html element
--}
-queryTagname : String -> Html msg -> List NodeType
-queryTagname =
-    queryByHtml queryTagnameInNode
-
-
-{-| Query for a node with a given id in a Html element
--}
-queryId : String -> Html msg -> List NodeType
-queryId =
-    queryByHtml queryIdInNode
-
-
-{-| Query for a node with a given classname in a Html element
--}
-queryClass : String -> Html msg -> List NodeType
-queryClass =
-    queryByHtml queryClassInNode
+hasClass : String -> NodeRecord -> Bool
+hasClass query { facts } =
+    Dict.get "className" facts.stringOthers
+        |> Maybe.withDefault ""
+        |> String.split " "
+        |> List.member query

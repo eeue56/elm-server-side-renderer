@@ -377,43 +377,48 @@ queryTests =
     in
         suite "Query tests"
             [ test "query by tagname returns an empty list if no matches"
-                <| assertEqualPair ( [], queryTagname "img" emptyDiv )
+                <| assertEqualPair ( [], queryByTagname "img" emptyDiv )
             , test "query by tagname finds a node"
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml emptyDiv ]
-                    , queryTagname "div" emptyDiv
+                    , queryByTagname "div" emptyDiv
                     )
             , test "query finds all nodes by tagname"
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml emptyP
                       , nodeTypeFromHtml emptyP
                       ]
-                    , queryTagname "p" (Html.div [] [ emptyP, emptyP ])
+                    , queryByTagname "p" (Html.div [] [ emptyP, emptyP ])
                     )
             , test "query by id returns an empty list if no matches"
                 <| assertEqualPair
                     ( []
-                    , queryId "myId" (Html.div [] [ emptyP, emptyP ])
+                    , queryById "myId" (Html.div [] [ emptyP, emptyP ])
                     )
             , test "query by id finds a node"
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml p1 ]
-                    , queryId "myP" (Html.div [] [ p1 ])
+                    , queryById "myP" (Html.div [] [ p1 ])
                     )
             , test "query by classname returns an empty list if no matches"
                 <| assertEqualPair
                     ( []
-                    , queryClass "my-class" (Html.div [] [ emptyP, emptyP ])
+                    , queryByClassname "my-class" (Html.div [] [ emptyP, emptyP ])
                     )
             , test "query by class finds a node"
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml p1 ]
-                    , queryClass "my-class" (Html.div [] [ p1, emptyP ])
+                    , queryByClassname "my-class" (Html.div [] [ p1, emptyP ])
                     )
-            , test "query by class finds all nodes node"
+            , test "query by class finds all nodes"
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml p1, nodeTypeFromHtml p2 ]
-                    , queryClass "my-class" (Html.div [] [ p1, p2, p3 ])
+                    , queryByClassname "my-class" (Html.div [] [ p1, p2, p3 ])
+                    )
+            , test "query by attribute finds all nodes"
+                <| assertEqualPair
+                    ( [ emptyDivWithManyAttributesDecoded ]
+                    , queryByAttribute "width" "50" (Html.div [] [ p1, emptyDivWithManyAttributes, p3 ])
                     )
             ]
 
