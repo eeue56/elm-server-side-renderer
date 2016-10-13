@@ -1,4 +1,4 @@
-module Constants exposing (..) --where
+module ServerSide.Constants exposing (..) --where
 
 styleKey : String
 styleKey = "STYLE"

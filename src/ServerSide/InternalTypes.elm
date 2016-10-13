@@ -1,4 +1,4 @@
-module InternalTypes
+module ServerSide.InternalTypes
     exposing
         ( NodeType(..)
         , TextTagRecord
@@ -12,8 +12,8 @@ module InternalTypes
 import Dict exposing (Dict)
 import Json.Encode
 import Json.Decode exposing ((:=))
-import Constants exposing (..)
-import Helpers exposing (..)
+import ServerSide.Constants exposing (..)
+import ServerSide.Helpers exposing (..)
 
 
 type NodeType

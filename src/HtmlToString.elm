@@ -6,9 +6,9 @@ import String
 import Dict exposing (Dict)
 import Json.Decode
 
-import Constants exposing (..)
-import Helpers exposing (..)
-import InternalTypes exposing (..)
+import ServerSide.Constants exposing (..)
+import ServerSide.Helpers exposing (..)
+import ServerSide.InternalTypes exposing (..)
 
 
 emptyFacts : Facts

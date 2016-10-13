@@ -1,14 +1,14 @@
-module Helpers exposing (..) -- where
+module ServerSide.Helpers exposing (..) -- where
 
 import String
 import Regex
-import Constants exposing (..)
+import ServerSide.Constants exposing (..)
 import Dict exposing (Dict)
 
 import Result
 import Json.Decode
 import Html
-import Native.Helpers
+import Native.ServerSideHelpers
 
 
 

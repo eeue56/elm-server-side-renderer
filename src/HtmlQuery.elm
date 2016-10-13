@@ -1,4 +1,4 @@
-module Query
+module HtmlQuery
     exposing
         ( query
         , queryById
@@ -10,11 +10,11 @@ module Query
         , Selector(..)
         )
 
-import Html exposing (Html)
-import HtmlToString exposing (nodeTypeFromHtml)
-import InternalTypes exposing (..)
 import Dict
 import String
+import Html exposing (Html)
+import HtmlToString exposing (nodeTypeFromHtml)
+import ServerSide.InternalTypes exposing (..)
 
 
 {-| Selectors to query a Html element

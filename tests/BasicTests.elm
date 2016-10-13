@@ -3,9 +3,9 @@ module BasicTests exposing (..)
 -- where
 
 import HtmlToString exposing (..)
-import InternalTypes exposing (..)
-import Helpers exposing (..)
-import Query exposing (..)
+import ServerSide.InternalTypes exposing (..)
+import ServerSide.Helpers exposing (..)
+import HtmlQuery exposing (..)
 import ElmTest exposing (..)
 import Html
 import Html.Attributes
