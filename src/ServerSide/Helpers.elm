@@ -14,7 +14,7 @@ import Native.ServerSideHelpers
 
 nativeAddThings : Html.Attribute msg -> Html.Html msg -> Html.Html msg
 nativeAddThings =
-    Native.Helpers.addAttribute
+    Native.ServerSideHelpers.addAttribute
 
 
 addAttribute : Html.Attribute msg -> Html.Html msg -> Html.Html msg
@@ -23,12 +23,12 @@ addAttribute attribute htmlThing =
 
 triggerEvent : String -> Json.Decode.Value -> Html.Html msg -> Result String msg
 triggerEvent =
-    Native.Helpers.triggerEvent
+    Native.ServerSideHelpers.triggerEvent
 
 
 stringify : a -> String
 stringify =
-    Native.Helpers.stringify
+    Native.ServerSideHelpers.stringify
 
 
 filterKnownKeys : Dict String a -> Dict String a
@@ -49,7 +49,7 @@ replaceInternalStructure =
 
 replaceChildren : String -> String
 replaceChildren =
-    Native.Helpers.replaceChildren
+    Native.ServerSideHelpers.replaceChildren
 
 wrapFieldsWithQuotes : String -> String
 wrapFieldsWithQuotes =
