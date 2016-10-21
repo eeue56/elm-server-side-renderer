@@ -6,6 +6,7 @@ module HtmlQuery
         , queryByClassList
         , queryByTagname
         , queryByAttribute
+        , queryAll
         , queryInNode
         , Selector(..)
         )
@@ -25,6 +26,8 @@ type Selector
     | ClassList (List String)
     | Tag String
     | Attribute String String
+    | ContainsText String
+    | Multiple (List Selector)
 
 
 {-| Query for a node with a given tag in a Html element
@@ -69,6 +72,13 @@ query selector =
     nodeTypeFromHtml >> queryInNode selector
 
 
+{-| Query to ensure a html node has all selectors given
+-}
+queryAll : List Selector -> Html msg -> List NodeType
+queryAll selectors =
+    query (Multiple selectors)
+
+
 {-| Query a Html node using a selector
 -}
 queryInNode : Selector -> NodeType -> List NodeType
@@ -87,8 +97,18 @@ queryInNode selector node =
                 else
                     mapChildren record.children
 
+        TextTag { text } ->
+            case selector of
+                ContainsText innerText ->
+                    if text == innerText then
+                        [ node ]
+                    else
+                        []
+                _ ->
+                    []
         _ ->
             []
+
 
 
 predicateFromSelector : Selector -> (NodeRecord -> Bool)
@@ -108,6 +128,19 @@ predicateFromSelector selector =
 
         Attribute key value ->
             hasAttribute key value
+
+        ContainsText text ->
+            always False
+
+        Multiple selectors ->
+            hasAllSelectors selectors
+
+
+hasAllSelectors : List Selector -> NodeRecord -> Bool
+hasAllSelectors selectors record =
+    List.map predicateFromSelector selectors
+        |> List.map (\selector -> selector record)
+        |> List.all identity
 
 
 hasAttribute : String -> String -> NodeRecord -> Bool
