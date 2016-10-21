@@ -6,6 +6,7 @@ module HtmlQuery
         , queryByClassList
         , queryByTagname
         , queryByAttribute
+        , queryByBoolAttribute
         , queryAll
         , queryInNode
         , Selector(..)
@@ -26,6 +27,7 @@ type Selector
     | ClassList (List String)
     | Tag String
     | Attribute String String
+    | BoolAttribute String Bool
     | ContainsText String
     | Multiple (List Selector)
 
@@ -63,6 +65,13 @@ queryByClassList classList =
 queryByAttribute : String -> String -> Html msg -> List NodeType
 queryByAttribute key value =
     query (Attribute key value)
+
+
+{-| Query for a node with a given attribute in a Html element
+-}
+queryByBoolAttribute : String -> Bool -> Html msg -> List NodeType
+queryByBoolAttribute key value =
+    query (BoolAttribute key value)
 
 
 {-| Query a Html element using a selector
@@ -129,6 +138,9 @@ predicateFromSelector selector =
         Attribute key value ->
             hasAttribute key value
 
+        BoolAttribute key value ->
+            hasBoolAttribute key value
+
         ContainsText text ->
             always False
 
@@ -148,6 +160,16 @@ hasAttribute attribute query { facts } =
     case Dict.get attribute facts.stringOthers of
         Just id ->
             id == query
+
+        Nothing ->
+            False
+
+
+hasBoolAttribute : String -> Bool -> NodeRecord -> Bool
+hasBoolAttribute attribute value { facts } =
+    case Dict.get attribute facts.boolOthers of
+        Just id ->
+            id == value
 
         Nothing ->
             False
