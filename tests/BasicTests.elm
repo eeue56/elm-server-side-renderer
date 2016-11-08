@@ -14,6 +14,8 @@ import Dict
 import String
 import Json.Encode
 
+import MarkdownTest
+
 
 -- DATA
 -- Empty things
@@ -439,6 +441,7 @@ allTests =
         [ textTests
         , nodeTests
         , queryTests
+        , MarkdownTest.nodeTests
         ]
 
 
