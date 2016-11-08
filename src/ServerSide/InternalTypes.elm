@@ -3,6 +3,8 @@ module ServerSide.InternalTypes
         ( NodeType(..)
         , TextTagRecord
         , NodeRecord
+        , CustomNodeRecord
+        , MarkdownNodeRecord
         , Facts
         , decodeNodeType
         )
@@ -12,6 +14,8 @@ module ServerSide.InternalTypes
 import Dict exposing (Dict)
 import Json.Encode
 import Json.Decode exposing ((:=))
+
+import ServerSide.Markdown exposing (..)
 import ServerSide.Constants exposing (..)
 import ServerSide.Helpers exposing (..)
 
@@ -19,6 +23,8 @@ import ServerSide.Helpers exposing (..)
 type NodeType
     = TextTag TextTagRecord
     | NodeEntry NodeRecord
+    | CustomNode CustomNodeRecord
+    | MarkdownNode MarkdownNodeRecord
     | NoOp
 
 
@@ -33,6 +39,17 @@ type alias NodeRecord =
         Facts
         --, namespace : String
     , descendantsCount : Int
+    }
+
+
+type alias MarkdownNodeRecord =
+    { facts : Facts
+    , model : MarkdownModel
+    }
+
+type alias CustomNodeRecord =
+    { facts : Facts
+    , model : Json.Decode.Value
     }
 
 
@@ -57,6 +74,9 @@ decodeNodeType =
 
                     "node" ->
                         Json.Decode.map NodeEntry (decodeNode)
+
+                    "custom" ->
+                        decodeCustomNode
 
                     _ ->
                         Json.Decode.fail ("No such type as " ++ typeString)
@@ -90,6 +110,27 @@ encodeNodeRecord record =
           --, ( "facts", encodeFacts)
         , ( "descendantsCount", Json.Encode.int record.descendantsCount )
         ]
+
+decodeCustomNode : Json.Decode.Decoder NodeType
+decodeCustomNode =
+    Json.Decode.oneOf
+        [ Json.Decode.map MarkdownNode decodeMarkdownNodeRecord
+        , Json.Decode.map CustomNode decodeCustomNodeRecord
+        ]
+
+
+decodeCustomNodeRecord : Json.Decode.Decoder CustomNodeRecord
+decodeCustomNodeRecord =
+    Json.Decode.object2 CustomNodeRecord
+        ("facts" := decodeFacts)
+        ("model" := Json.Decode.value)
+
+
+decodeMarkdownNodeRecord : Json.Decode.Decoder MarkdownNodeRecord
+decodeMarkdownNodeRecord =
+    Json.Decode.object2 MarkdownNodeRecord
+        ("facts" := decodeFacts)
+        ("model" := decodeMarkdownModel)
 
 
 decodeStyles : Json.Decode.Decoder (Dict String String)

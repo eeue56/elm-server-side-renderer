@@ -104,6 +104,10 @@ nodeTypeToString nodeType =
             text
         NodeEntry record ->
             nodeRecordToString record
+        CustomNode record ->
+            ""
+        MarkdownNode record ->
+            record.model.markdown
         NoOp ->
             ""
 
