@@ -75,11 +75,11 @@ decodeNodeType =
                     "node" ->
                         Json.Decode.map NodeEntry (decodeNode)
 
-                    "tagger" ->
-                        Json.Decode.map NodeEntry (decodeTagger)
-
                     "custom" ->
                         decodeCustomNode
+
+                    "tagger" ->
+                        decodeTagger
 
                     _ ->
                         Json.Decode.fail ("No such type as " ++ typeString)
@@ -96,9 +96,13 @@ encodeTextTag { text } =
     Json.Encode.object [ ( "text", Json.Encode.string text ) ]
 
 
-decodeTagger : Json.Decode.Decoder NodeRecord
+decodeTagger : Json.Decode.Decoder NodeType
 decodeTagger =
-    Json.Decode.at [ "node" ] decodeNode
+    Json.Decode.oneOf
+        [ Json.Decode.at [ "node" ] decodeNodeType
+        , Json.Decode.at [ "text" ] decodeNodeType
+        , Json.Decode.at [ "custom" ] decodeNodeType
+        ]
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
