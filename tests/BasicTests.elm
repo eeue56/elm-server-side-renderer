@@ -13,8 +13,8 @@ import Html.Events
 import Dict
 import String
 import Json.Encode
-
 import MarkdownTest
+import TeaTest
 
 
 -- DATA
@@ -442,6 +442,7 @@ allTests =
         , nodeTests
         , queryTests
         , MarkdownTest.nodeTests
+        , TeaTest.all
         ]
 
 

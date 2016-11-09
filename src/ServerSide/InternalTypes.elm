@@ -78,6 +78,9 @@ decodeNodeType =
                     "custom" ->
                         decodeCustomNode
 
+                    "tagger" ->
+                        decodeTagger
+
                     _ ->
                         Json.Decode.fail ("No such type as " ++ typeString)
             )
@@ -91,6 +94,15 @@ decodeTextTag =
 encodeTextTag : TextTagRecord -> Json.Encode.Value
 encodeTextTag { text } =
     Json.Encode.object [ ( "text", Json.Encode.string text ) ]
+
+
+decodeTagger : Json.Decode.Decoder NodeType
+decodeTagger =
+    Json.Decode.oneOf
+        [ Json.Decode.at [ "node" ] decodeNodeType
+        , Json.Decode.at [ "text" ] decodeNodeType
+        , Json.Decode.at [ "custom" ] decodeNodeType
+        ]
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
