@@ -75,6 +75,9 @@ decodeNodeType =
                     "node" ->
                         Json.Decode.map NodeEntry (decodeNode)
 
+                    "tagger" ->
+                        Json.Decode.map NodeEntry (decodeTagger)
+
                     "custom" ->
                         decodeCustomNode
 
@@ -91,6 +94,11 @@ decodeTextTag =
 encodeTextTag : TextTagRecord -> Json.Encode.Value
 encodeTextTag { text } =
     Json.Encode.object [ ( "text", Json.Encode.string text ) ]
+
+
+decodeTagger : Json.Decode.Decoder NodeRecord
+decodeTagger =
+    Json.Decode.at [ "node" ] decodeNode
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
