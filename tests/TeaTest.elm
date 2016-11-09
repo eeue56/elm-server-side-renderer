@@ -7,6 +7,7 @@ import Html.Attributes
 import Html.Events
 import HtmlQuery exposing (..)
 import HtmlToString exposing (..)
+import String
 
 
 darthVader : Html.Html Msg
@@ -22,6 +23,8 @@ lukeSkywalker =
     Html.div []
         [ Html.button [ Html.Events.onClick LightSide ] [ Html.text "nooo" ]
         , Html.App.map SubSubComp r2d2
+        , Html.App.map SubSubComp (Html.div [ Html.Attributes.class "force" ] [])
+        , Html.App.map SubSubComp (Html.text "Han shot first")
         ]
 
 
@@ -58,4 +61,12 @@ all =
             assertEqual 1 <|
                 List.length <|
                     queryByTagname "span" darthVader
+        , test "should work when Html.App.map a empty div" <|
+            assertEqual 1 <|
+                List.length <|
+                    queryByClassname "force" darthVader
+        , test "should work when Html.App.map a text node" <|
+            assertEqual True <|
+                String.contains "Han shot first" <|
+                    htmlToString darthVader
         ]
