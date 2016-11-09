@@ -19,7 +19,15 @@ darthVader =
 
 lukeSkywalker : Html.Html SubMsg
 lukeSkywalker =
-    Html.button [ Html.Events.onClick LightSide ] [ Html.text "nooo" ]
+    Html.div []
+        [ Html.button [ Html.Events.onClick LightSide ] [ Html.text "nooo" ]
+        , Html.App.map SubSubComp r2d2
+        ]
+
+
+r2d2 : Html.Html SubSubMsg
+r2d2 =
+    Html.span [ Html.Events.onClick Beep ] []
 
 
 type Msg
@@ -28,6 +36,11 @@ type Msg
 
 type SubMsg
     = LightSide
+    | SubSubComp SubSubMsg
+
+
+type SubSubMsg
+    = Beep
 
 
 all : Test
@@ -37,8 +50,12 @@ all =
             assertEqual 1 <|
                 List.length <|
                     queryByTagname "p" darthVader
-        , test "should render the child view" <|
+        , test "should render child views" <|
             assertEqual 1 <|
                 List.length <|
                     queryByTagname "button" darthVader
+        , test "should render child views of child views" <|
+            assertEqual 1 <|
+                List.length <|
+                    queryByTagname "span" darthVader
         ]
