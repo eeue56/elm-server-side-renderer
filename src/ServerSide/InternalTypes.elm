@@ -72,6 +72,9 @@ decodeNodeType =
                     "text" ->
                         Json.Decode.map TextTag (decodeTextTag)
 
+                    "keyed-node" ->
+                        Json.Decode.map NodeEntry (decodeNode)
+
                     "node" ->
                         Json.Decode.map NodeEntry (decodeNode)
 
