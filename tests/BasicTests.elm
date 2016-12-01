@@ -10,6 +10,7 @@ import ElmTest exposing (..)
 import Html
 import Html.Attributes
 import Html.Events
+import Html.Keyed as Keyed
 import Dict
 import String
 import Json.Encode
@@ -187,6 +188,20 @@ emptyDivWithStyleDecoded =
         }
 
 
+emptyKeyedNode : Html.Html msg
+emptyKeyedNode =
+    Keyed.ul [] []
+
+
+emptyKeyedUlDecoded : NodeType
+emptyKeyedUlDecoded =
+    NodeEntry
+        { tag = "ul"
+        , children = []
+        , descendantsCount = 0
+        , facts = emptyFacts
+        }
+
 
 -- Non empty things!
 
@@ -328,6 +343,8 @@ nodeTests =
             <| assertEqualPair ( emptyDivWithAddedAttributeAsString, htmlToString emptyDivWithAddedAttribute )
         , test "empty divs are decoded to empty div nodes"
             <| assertEqualPair ( emptyDivWithAddedAttributeDecoded, nodeTypeFromHtml emptyDivWithAddedAttribute )
+        , test "empty keyed ul is decoded to empty ul node"
+            <| assertEqualPair ( emptyKeyedUlDecoded, nodeTypeFromHtml emptyKeyedNode)
         , test "empty divs with classes get classes as a string"
             <| assertEqualPair ( emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute )
         , test "empty divs with classes are decoded to empty div nodes with classes"
@@ -378,6 +395,11 @@ queryTests =
                 <| assertEqualPair
                     ( [ nodeTypeFromHtml emptyDiv ]
                     , queryByTagname "div" emptyDiv
+                    )
+            , test "query by tagname finds a keyed node"
+                <| assertEqualPair
+                    ( [ nodeTypeFromHtml emptyKeyedNode ]
+                    , queryByTagname "ul" emptyKeyedNode
                     )
             , test "query finds all nodes by tagname"
                 <| assertEqualPair
