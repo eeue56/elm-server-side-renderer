@@ -1,7 +1,5 @@
 module BasicTests exposing (..)
 
--- where
-
 import HtmlToString exposing (..)
 import ServerSide.InternalTypes exposing (..)
 import ServerSide.Helpers exposing (..)
@@ -282,6 +280,50 @@ twoChildFormDecoded =
             }
 
 
+keyedNodeWithText : Html.Html msg
+keyedNodeWithText =
+    Keyed.ul [] [ ("0", Html.text "Hello!") ]
+
+
+keyedNodeWithTextDecoded : NodeType
+keyedNodeWithTextDecoded =
+    NodeEntry
+        { tag = "ul"
+        , children = [ TextTag { text = "Hello!" } ]
+        , descendantsCount = 1
+        , facts = emptyFacts
+        }
+
+
+keyedNodeWithChildren : Int -> Html.Html msg
+keyedNodeWithChildren childrenCount =
+    let
+        liWithText val =
+            ( toString val, Html.li [] [ Html.text (toString val) ] )
+    in
+        Keyed.ul [] <|
+            List.map liWithText [1..childrenCount]
+
+
+keyedNodeWithChildrenDecoded : Int -> NodeType
+keyedNodeWithChildrenDecoded childrenCount =
+    let
+        liWithTextDecoded val =
+            NodeEntry
+                { tag = "li"
+                , children = [ TextTag { text = toString val } ]
+                , descendantsCount = 1
+                , facts = emptyFacts
+                }
+    in
+        NodeEntry
+            { tag = "ul"
+            , children = List.map (toString >> liWithTextDecoded) [1..childrenCount]
+            , descendantsCount = childrenCount
+            , facts = emptyFacts
+            }
+
+
 
 -- HELPERS
 
@@ -369,6 +411,12 @@ nodeTests =
             <| assertEqualPair ( twoChildFormAsString, htmlToString twoChildForm )
         , test "forms with two non-empty text children are decoded to just a form with text"
             <| assertEqualPair ( twoChildFormDecoded, nodeTypeFromHtml twoChildForm )
+        , test "ul with a child text node"
+            <| assertEqualPair ( keyedNodeWithTextDecoded, nodeTypeFromHtml keyedNodeWithText )
+        , test "ul with one non-empty child is decoded"
+            <| assertEqualPair ( keyedNodeWithChildrenDecoded 1, nodeTypeFromHtml <| keyedNodeWithChildren 1 )
+        , test "ul with two non-empty children are decoded"
+            <| assertEqualPair ( keyedNodeWithChildrenDecoded 2, nodeTypeFromHtml <| keyedNodeWithChildren 2 )
         ]
 
 
