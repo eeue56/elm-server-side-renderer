@@ -70,13 +70,13 @@ decodeNodeType =
             (\typeString ->
                 case typeString of
                     "text" ->
-                        Json.Decode.map TextTag (decodeTextTag)
+                        Json.Decode.map TextTag decodeTextTag
 
                     "keyed-node" ->
-                        Json.Decode.map NodeEntry (decodeNode)
+                        Json.Decode.map NodeEntry decodeNode
 
                     "node" ->
-                        Json.Decode.map NodeEntry (decodeNode)
+                        Json.Decode.map NodeEntry decodeNode
 
                     "custom" ->
                         decodeCustomNode
