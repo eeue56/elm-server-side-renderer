@@ -96,9 +96,18 @@ function triggerEvent(eventName, value, node){
     return A2(_elm_lang$core$Native_Json.run, events[eventName].decoder, value)
 }
 
+function stringify(node) {
+    if (node.type == "keyed-node") {
+        node.children = node.children.map(function(childNode){
+            return childNode["_1"]
+        });
+    }
+    return JSON.stringify(node);
+}
+
 return {
     replaceChildren: replaceChildren,
-    stringify: JSON.stringify,
+    stringify: stringify,
     addAttribute: F2(addAttribute),
     triggerEvent: F3(triggerEvent)
 };
