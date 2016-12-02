@@ -324,6 +324,20 @@ keyedNodeWithChildrenDecoded childrenCount =
             }
 
 
+keyedNodeWithKeyedChildren : Int -> Html.Html msg
+keyedNodeWithKeyedChildren childrenCount =
+    let
+        liWithText val =
+            ( toString val, Keyed.node "li" [] [ ("1", Html.text (toString val)) ] )
+    in
+        Keyed.ul [] <|
+            List.map liWithText [1..childrenCount]
+
+
+keyedNodeWithKeyedChildrenDecoded : Int -> NodeType
+keyedNodeWithKeyedChildrenDecoded =
+    keyedNodeWithChildrenDecoded
+
 
 -- HELPERS
 
@@ -417,6 +431,10 @@ nodeTests =
             <| assertEqualPair ( keyedNodeWithChildrenDecoded 1, nodeTypeFromHtml <| keyedNodeWithChildren 1 )
         , test "ul with two non-empty children are decoded"
             <| assertEqualPair ( keyedNodeWithChildrenDecoded 2, nodeTypeFromHtml <| keyedNodeWithChildren 2 )
+        , test "ul with one non-empty keyed child is decoded"
+            <| assertEqualPair ( keyedNodeWithKeyedChildrenDecoded 1, nodeTypeFromHtml <| keyedNodeWithKeyedChildren 1 )
+        , test "ul with two non-empty keyed children are decoded"
+            <| assertEqualPair ( keyedNodeWithKeyedChildrenDecoded 2, nodeTypeFromHtml <| keyedNodeWithKeyedChildren 2 )
         ]
 
 
