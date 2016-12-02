@@ -73,7 +73,7 @@ decodeNodeType =
                         Json.Decode.map TextTag decodeTextTag
 
                     "keyed-node" ->
-                        Json.Decode.map NodeEntry decodeNode
+                        decodeKeyedNode
 
                     "node" ->
                         Json.Decode.map NodeEntry decodeNode
@@ -106,6 +106,25 @@ decodeTagger =
         , Json.Decode.at [ "text" ] decodeNodeType
         , Json.Decode.at [ "custom" ] decodeNodeType
         ]
+
+
+decodeKeyedNode : Json.Decode.Decoder NodeType
+decodeKeyedNode =
+    Json.Decode.map NodeEntry
+        (Json.Decode.object4 NodeRecord
+        ("tag" := Json.Decode.string)
+        ("children" := Json.Decode.list decodeKeyedNodeType)
+        ("facts" := decodeFacts)
+        ("descendantsCount" := Json.Decode.int))
+
+
+decodeKeyedNodeType : Json.Decode.Decoder NodeType
+decodeKeyedNodeType =
+    Json.Decode.at [ "_1" ]
+        (Json.Decode.oneOf
+            [ Json.Decode.map TextTag decodeTextTag
+            ]
+        )
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
