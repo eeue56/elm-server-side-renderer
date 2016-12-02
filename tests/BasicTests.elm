@@ -311,7 +311,7 @@ keyedNodeWithChildrenDecoded childrenCount =
         liWithTextDecoded val =
             NodeEntry
                 { tag = "li"
-                , children = [ TextTag { text = toString val } ]
+                , children = [ TextTag { text = val } ]
                 , descendantsCount = 1
                 , facts = emptyFacts
                 }
@@ -319,7 +319,7 @@ keyedNodeWithChildrenDecoded childrenCount =
         NodeEntry
             { tag = "ul"
             , children = List.map (toString >> liWithTextDecoded) [1..childrenCount]
-            , descendantsCount = childrenCount
+            , descendantsCount = childrenCount * 2
             , facts = emptyFacts
             }
 
