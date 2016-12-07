@@ -301,6 +301,36 @@ keyedNodeWithTextDecoded =
         }
 
 
+keyedNodeOneChild : Html.Html msg
+keyedNodeOneChild =
+    keyedNodeWithChildren 1
+
+
+keyedNodeOneChildDecoded : NodeType
+keyedNodeOneChildDecoded =
+    keyedNodeWithChildrenDecoded 1
+
+
+keyedNodeTwoChildren : Html.Html msg
+keyedNodeTwoChildren =
+    keyedNodeWithChildren 2
+
+
+keyedNodeTwoChildrenDecoded : NodeType
+keyedNodeTwoChildrenDecoded =
+    keyedNodeWithChildrenDecoded 2
+
+
+keyedNodeOneKeyedChild : Html.Html msg
+keyedNodeOneKeyedChild =
+    keyedNodeWithKeyedChildren 1
+
+
+keyedNodeTwoKeyedChildren : Html.Html msg
+keyedNodeTwoKeyedChildren =
+    keyedNodeWithKeyedChildren 2
+
+
 
 -- HELPERS
 
@@ -375,12 +405,6 @@ keyedNodeWithKeyedChildren childrenCount =
             List.map liWithText [1..childrenCount]
 
 
--- alias for keyedNodeWithChildrenDecoded
-keyedNodeWithKeyedChildrenDecoded : Int -> NodeType
-keyedNodeWithKeyedChildrenDecoded =
-    keyedNodeWithChildrenDecoded
-
-
 
 -- TESTS
 
@@ -439,13 +463,13 @@ nodeTests =
         , test "ul with a child text node"
             <| assertEqualPair ( keyedNodeWithTextDecoded, nodeTypeFromHtml keyedNodeWithText )
         , test "ul with one non-empty child is decoded"
-            <| assertEqualPair ( keyedNodeWithChildrenDecoded 1, nodeTypeFromHtml <| keyedNodeWithChildren 1 )
+            <| assertEqualPair ( keyedNodeOneChildDecoded, nodeTypeFromHtml keyedNodeOneChild )
         , test "ul with two non-empty children are decoded"
-            <| assertEqualPair ( keyedNodeWithChildrenDecoded 2, nodeTypeFromHtml <| keyedNodeWithChildren 2 )
+            <| assertEqualPair ( keyedNodeTwoChildrenDecoded, nodeTypeFromHtml keyedNodeTwoChildren )
         , test "ul with one non-empty keyed child is decoded"
-            <| assertEqualPair ( keyedNodeWithKeyedChildrenDecoded 1, nodeTypeFromHtml <| keyedNodeWithKeyedChildren 1 )
+            <| assertEqualPair ( keyedNodeOneChildDecoded, nodeTypeFromHtml keyedNodeOneKeyedChild )
         , test "ul with two non-empty keyed children are decoded"
-            <| assertEqualPair ( keyedNodeWithKeyedChildrenDecoded 2, nodeTypeFromHtml <| keyedNodeWithKeyedChildren 2 )
+            <| assertEqualPair ( keyedNodeTwoChildrenDecoded, nodeTypeFromHtml keyedNodeTwoKeyedChildren )
         ]
 
 
