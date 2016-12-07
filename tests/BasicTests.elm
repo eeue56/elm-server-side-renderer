@@ -574,6 +574,6 @@ allTests =
         ]
 
 
-main : Program Never
+main : Program Never () msg
 main =
     runSuite allTests
