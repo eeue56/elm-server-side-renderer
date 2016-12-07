@@ -1,8 +1,7 @@
 module ServerSide.Markdown exposing (..)
 
-import Dict exposing (Dict)
 import Json.Encode
-import Json.Decode exposing ((:=))
+import Json.Decode
 
 
 baseMarkdownModel : MarkdownModel
@@ -49,5 +48,5 @@ encodeMarkdownModel model =
 
 decodeMarkdownModel : Json.Decode.Decoder MarkdownModel
 decodeMarkdownModel =
-    Json.Decode.object1 (MarkdownModel baseMarkdownModel.options)
-        ("markdown" := Json.Decode.string)
+    Json.Decode.map (MarkdownModel baseMarkdownModel.options)
+        (Json.Decode.field "markdown" Json.Decode.string)

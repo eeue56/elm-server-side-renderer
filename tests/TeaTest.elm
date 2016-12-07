@@ -2,7 +2,6 @@ module TeaTest exposing (..)
 
 import Legacy.ElmTest as ElmTest exposing (..)
 import Html
-import Html.App
 import Html.Attributes
 import Html.Events
 import HtmlQuery exposing (..)
@@ -14,7 +13,7 @@ darthVader : Html.Html Msg
 darthVader =
     Html.div []
         [ Html.p [] [ Html.text "Luke I'm your father." ]
-        , Html.App.map SubComp lukeSkywalker
+        , Html.map SubComp lukeSkywalker
         ]
 
 
@@ -22,9 +21,9 @@ lukeSkywalker : Html.Html SubMsg
 lukeSkywalker =
     Html.div []
         [ Html.button [ Html.Events.onClick LightSide ] [ Html.text "nooo" ]
-        , Html.App.map SubSubComp r2d2
-        , Html.App.map SubSubComp (Html.div [ Html.Attributes.class "force" ] [])
-        , Html.App.map SubSubComp (Html.text "Han shot first")
+        , Html.map SubSubComp r2d2
+        , Html.map SubSubComp (Html.div [ Html.Attributes.class "force" ] [])
+        , Html.map SubSubComp (Html.text "Han shot first")
         ]
 
 
@@ -61,11 +60,11 @@ all =
             assertEqual 1 <|
                 List.length <|
                     queryByTagname "span" darthVader
-        , test "should work when Html.App.map a empty div" <|
+        , test "should work when Html.map a empty div" <|
             assertEqual 1 <|
                 List.length <|
                     queryByClassname "force" darthVader
-        , test "should work when Html.App.map a text node" <|
+        , test "should work when Html.map a text node" <|
             assertEqual True <|
                 String.contains "Han shot first" <|
                     htmlToString darthVader
