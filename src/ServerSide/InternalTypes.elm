@@ -110,11 +110,16 @@ decodeTagger =
 
 decodeKeyedNode : Json.Decode.Decoder NodeRecord
 decodeKeyedNode =
-    Json.Decode.object4 NodeRecord
-        ("tag" := Json.Decode.string)
-        ("children" := Json.Decode.list (Json.Decode.at [ "_1" ] decodeNodeType))
-        ("facts" := decodeFacts)
-        ("descendantsCount" := Json.Decode.int)
+    let
+        -- elm stores keyed nodes as tuples
+        -- we only want to decode the html, in the second property
+        decodeSecondNode = (Json.Decode.at [ "_1" ] decodeNodeType)
+    in
+        Json.Decode.object4 NodeRecord
+            ("tag" := Json.Decode.string)
+            ("children" := Json.Decode.list decodeSecondNode)
+            ("facts" := decodeFacts)
+            ("descendantsCount" := Json.Decode.int)
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
