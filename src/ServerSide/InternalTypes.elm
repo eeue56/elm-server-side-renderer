@@ -9,8 +9,6 @@ module ServerSide.InternalTypes
         , decodeNodeType
         )
 
--- where
-
 import Dict exposing (Dict)
 import Json.Encode
 import Json.Decode exposing ((:=))

@@ -1,7 +1,5 @@
 module ServerSide.Constants exposing (..)
 
---where
-
 
 styleKey : String
 styleKey =

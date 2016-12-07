@@ -1,7 +1,5 @@
 module HtmlToString exposing (..)
 
--- where
-
 import Html exposing (Html)
 import String
 import Dict exposing (Dict)

@@ -1,7 +1,5 @@
 module ServerSide.Helpers exposing (..)
 
--- where
-
 import String
 import Regex
 import ServerSide.Constants exposing (..)
