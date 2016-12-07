@@ -16,6 +16,7 @@ baseMarkdownModel =
     , markdown = ""
     }
 
+
 type alias MarkdownOptions =
     { githubFlavored : Maybe { tables : Bool, breaks : Bool }
     , defaultHighlighting : Maybe String
@@ -41,7 +42,7 @@ encodeOptions options =
 encodeMarkdownModel : MarkdownModel -> Json.Decode.Value
 encodeMarkdownModel model =
     Json.Encode.object
-        [ ("options", encodeOptions model.options )
+        [ ( "options", encodeOptions model.options )
         , ( "markdown", Json.Encode.string model.markdown )
         ]
 
@@ -49,5 +50,4 @@ encodeMarkdownModel model =
 decodeMarkdownModel : Json.Decode.Decoder MarkdownModel
 decodeMarkdownModel =
     Json.Decode.object1 (MarkdownModel baseMarkdownModel.options)
-        ( "markdown" := Json.Decode.string )
-
+        ("markdown" := Json.Decode.string)

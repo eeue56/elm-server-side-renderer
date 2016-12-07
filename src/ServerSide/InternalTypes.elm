@@ -14,7 +14,6 @@ module ServerSide.InternalTypes
 import Dict exposing (Dict)
 import Json.Encode
 import Json.Decode exposing ((:=))
-
 import ServerSide.Markdown exposing (..)
 import ServerSide.Constants exposing (..)
 import ServerSide.Helpers exposing (..)
@@ -46,6 +45,7 @@ type alias MarkdownNodeRecord =
     { facts : Facts
     , model : MarkdownModel
     }
+
 
 type alias CustomNodeRecord =
     { facts : Facts
@@ -113,7 +113,8 @@ decodeKeyedNode =
     let
         -- elm stores keyed nodes as tuples
         -- we only want to decode the html, in the second property
-        decodeSecondNode = (Json.Decode.at [ "_1" ] decodeNodeType)
+        decodeSecondNode =
+            (Json.Decode.at [ "_1" ] decodeNodeType)
     in
         Json.Decode.object4 NodeRecord
             ("tag" := Json.Decode.string)
@@ -139,6 +140,7 @@ encodeNodeRecord record =
           --, ( "facts", encodeFacts)
         , ( "descendantsCount", Json.Encode.int record.descendantsCount )
         ]
+
 
 decodeCustomNode : Json.Decode.Decoder NodeType
 decodeCustomNode =
