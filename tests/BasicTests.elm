@@ -4,7 +4,7 @@ import HtmlToString exposing (..)
 import ServerSide.InternalTypes exposing (..)
 import ServerSide.Helpers exposing (..)
 import HtmlQuery exposing (..)
-import ElmTest exposing (..)
+import Legacy.ElmTest as ElmTest exposing (..)
 import Html
 import Html.Attributes
 import Html.Events

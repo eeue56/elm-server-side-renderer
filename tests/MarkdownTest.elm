@@ -5,7 +5,7 @@ import ServerSide.InternalTypes exposing (..)
 import ServerSide.Helpers exposing (..)
 import ServerSide.Markdown exposing (..)
 import HtmlQuery exposing (..)
-import ElmTest exposing (..)
+import Legacy.ElmTest as ElmTest exposing (..)
 import Html
 import Html.Attributes exposing (id)
 import Markdown

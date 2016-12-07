@@ -1,6 +1,6 @@
 module TeaTest exposing (..)
 
-import ElmTest exposing (..)
+import Legacy.ElmTest as ElmTest exposing (..)
 import Html
 import Html.App
 import Html.Attributes
