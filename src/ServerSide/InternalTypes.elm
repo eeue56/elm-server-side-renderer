@@ -70,10 +70,13 @@ decodeNodeType =
             (\typeString ->
                 case typeString of
                     "text" ->
-                        Json.Decode.map TextTag (decodeTextTag)
+                        Json.Decode.map TextTag decodeTextTag
+
+                    "keyed-node" ->
+                        Json.Decode.map NodeEntry decodeKeyedNode
 
                     "node" ->
-                        Json.Decode.map NodeEntry (decodeNode)
+                        Json.Decode.map NodeEntry decodeNode
 
                     "custom" ->
                         decodeCustomNode
@@ -103,6 +106,20 @@ decodeTagger =
         , Json.Decode.at [ "text" ] decodeNodeType
         , Json.Decode.at [ "custom" ] decodeNodeType
         ]
+
+
+decodeKeyedNode : Json.Decode.Decoder NodeRecord
+decodeKeyedNode =
+    let
+        -- elm stores keyed nodes as tuples
+        -- we only want to decode the html, in the second property
+        decodeSecondNode = (Json.Decode.at [ "_1" ] decodeNodeType)
+    in
+        Json.Decode.object4 NodeRecord
+            ("tag" := Json.Decode.string)
+            ("children" := Json.Decode.list decodeSecondNode)
+            ("facts" := decodeFacts)
+            ("descendantsCount" := Json.Decode.int)
 
 
 decodeNode : Json.Decode.Decoder NodeRecord
