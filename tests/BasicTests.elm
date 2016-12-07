@@ -301,49 +301,6 @@ keyedNodeWithTextDecoded =
         }
 
 
-keyedNodeWithChildren : Int -> Html.Html msg
-keyedNodeWithChildren childrenCount =
-    let
-        liWithText val =
-            ( toString val, Html.li [] [ Html.text (toString val) ] )
-    in
-        Keyed.ul [] <|
-            List.map liWithText [1..childrenCount]
-
-
-keyedNodeWithChildrenDecoded : Int -> NodeType
-keyedNodeWithChildrenDecoded childrenCount =
-    let
-        liWithTextDecoded val =
-            NodeEntry
-                { tag = "li"
-                , children = [ TextTag { text = val } ]
-                , descendantsCount = 1
-                , facts = emptyFacts
-                }
-    in
-        NodeEntry
-            { tag = "ul"
-            , children = List.map (toString >> liWithTextDecoded) [1..childrenCount]
-            , descendantsCount = childrenCount * 2
-            , facts = emptyFacts
-            }
-
-
-keyedNodeWithKeyedChildren : Int -> Html.Html msg
-keyedNodeWithKeyedChildren childrenCount =
-    let
-        liWithText val =
-            ( toString val, Keyed.node "li" [] [ ("1", Html.text (toString val)) ] )
-    in
-        Keyed.ul [] <|
-            List.map liWithText [1..childrenCount]
-
-
-keyedNodeWithKeyedChildrenDecoded : Int -> NodeType
-keyedNodeWithKeyedChildrenDecoded =
-    keyedNodeWithChildrenDecoded
-
 
 -- HELPERS
 
@@ -374,6 +331,54 @@ countDescendents nodeType =
 
         _ ->
             0
+
+
+-- creates a keyed `ul` with `n` children (`li`).
+keyedNodeWithChildren : Int -> Html.Html msg
+keyedNodeWithChildren childrenCount =
+    let
+        liWithText val =
+            ( toString val, Html.li [] [ Html.text (toString val) ] )
+    in
+        Keyed.ul [] <|
+            List.map liWithText [1..childrenCount]
+
+
+-- creates a decoded keyed `ul` with `n` children (`li`).
+keyedNodeWithChildrenDecoded : Int -> NodeType
+keyedNodeWithChildrenDecoded childrenCount =
+    let
+        liWithTextDecoded val =
+            NodeEntry
+                { tag = "li"
+                , children = [ TextTag { text = val } ]
+                , descendantsCount = 1
+                , facts = emptyFacts
+                }
+    in
+        NodeEntry
+            { tag = "ul"
+            , children = List.map (toString >> liWithTextDecoded) [1..childrenCount]
+            , descendantsCount = childrenCount * 2
+            , facts = emptyFacts
+            }
+
+
+-- creates a keyed `ul` with `n` keyed children (`li`).
+keyedNodeWithKeyedChildren : Int -> Html.Html msg
+keyedNodeWithKeyedChildren childrenCount =
+    let
+        liWithText val =
+            ( toString val, Keyed.node "li" [] [ ("1", Html.text (toString val)) ] )
+    in
+        Keyed.ul [] <|
+            List.map liWithText [1..childrenCount]
+
+
+-- alias for keyedNodeWithChildrenDecoded
+keyedNodeWithKeyedChildrenDecoded : Int -> NodeType
+keyedNodeWithKeyedChildrenDecoded =
+    keyedNodeWithChildrenDecoded
 
 
 
