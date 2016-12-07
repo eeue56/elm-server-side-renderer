@@ -64,6 +64,7 @@ emptyDivWithClick =
         []
 
 
+inputText : Json.Encode.Value
 inputText =
     Json.Encode.object
         [ ( "target"
