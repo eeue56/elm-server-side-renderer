@@ -38,8 +38,6 @@ filterKnownKeys =
 
 -- UNUSED
 -- Hacky text approach
-
-
 wrapWithQuotesAndColons : String -> String -> String
 wrapWithQuotesAndColons left right =
     "\"" ++ (String.trim left) ++ "\"" ++ ":" ++ right

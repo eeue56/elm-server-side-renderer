@@ -2,23 +2,16 @@ module ServerSide.Constants exposing (..)
 
 
 styleKey : String
-styleKey =
-    "STYLE"
-
+styleKey = "STYLE"
 
 eventKey : String
-eventKey =
-    "EVENT"
-
+eventKey = "EVENT"
 
 attributeKey : String
-attributeKey =
-    "ATTR"
-
+attributeKey = "ATTR"
 
 attributeNamespaceKey : String
-attributeNamespaceKey =
-    "ATTR_NS"
+attributeNamespaceKey = "ATTR_NS"
 
 
 knownKeys : List String

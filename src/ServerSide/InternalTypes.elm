@@ -54,7 +54,6 @@ type alias CustomNodeRecord =
 type alias Facts =
     { styles : Dict String String
     , events : Maybe Json.Decode.Value
-    , attributes : Maybe Json.Decode.Value
     , attributeNamespace : Maybe Json.Decode.Value
     , stringOthers : Dict String String
     , boolOthers : Dict String Bool
@@ -181,32 +180,45 @@ encodeStyles stylesDict =
     in
         Json.Encode.object [ ( styleKey, Json.Encode.object encodedDict ) ]
 
-
+{-| grab things from attributes via a decoder, then anything that isn't filtered on
+    the object
+-}
 decodeOthers : Json.Decode.Decoder a -> Json.Decode.Decoder (Dict String a)
 decodeOthers otherDecoder =
+    decodeAttributes otherDecoder
+        |> Json.Decode.andThen (\attributes ->
+            decodeDictFilterMap otherDecoder
+                |> Json.Decode.map (filterKnownKeys >> Dict.union attributes)
+        )
+
+{-| For a given decoder, keep the values from a dict that pass the decoder -}
+decodeDictFilterMap : Json.Decode.Decoder a -> Json.Decode.Decoder (Dict String a)
+decodeDictFilterMap decoder =
     Json.Decode.dict Json.Decode.value
         |> Json.Decode.map
-            (filterKnownKeys
-                >> Dict.toList
+            (Dict.toList
                 >> List.filterMap
-                    (\( key, value ) ->
-                        case Json.Decode.decodeValue otherDecoder value of
-                            Err _ ->
-                                Nothing
-
-                            Ok v ->
-                                Just ( key, v )
+                    (\(key, value) ->
+                        case Json.Decode.decodeValue decoder value of
+                            Err _ -> Nothing
+                            Ok v -> Just ( key, v )
                     )
                 >> Dict.fromList
             )
 
+decodeAttributes : Json.Decode.Decoder a -> Json.Decode.Decoder (Dict String a)
+decodeAttributes decoder =
+    Json.Decode.oneOf
+        [ Json.Decode.field attributeKey (decodeDictFilterMap decoder)
+        , Json.Decode.succeed Dict.empty
+        ]
+
 
 decodeFacts : Json.Decode.Decoder Facts
 decodeFacts =
-    Json.Decode.map6 Facts
+    Json.Decode.map5 Facts
         (decodeStyles)
         (Json.Decode.maybe (Json.Decode.field eventKey Json.Decode.value))
-        (Json.Decode.maybe (Json.Decode.field attributeKey Json.Decode.value))
         (Json.Decode.maybe (Json.Decode.field attributeNamespaceKey Json.Decode.value))
         (decodeOthers Json.Decode.string)
         (decodeOthers Json.Decode.bool)

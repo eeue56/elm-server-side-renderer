@@ -13,7 +13,6 @@ emptyFacts : Facts
 emptyFacts =
     { styles = Dict.empty
     , events = Nothing
-    , attributes = Nothing
     , attributeNamespace = Nothing
     , stringOthers = Dict.empty
     , boolOthers = Dict.empty
@@ -90,6 +89,7 @@ nodeRecordToString { tag, children, facts } =
                 |> List.map (\( k, v ) -> k ++ "=" ++ (String.toLower <| toString v))
                 |> String.join " "
                 |> Just
+
     in
         String.join ""
             [ openTag [ classes, styles, stringOthers, boolOthers ]

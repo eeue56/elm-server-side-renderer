@@ -17,9 +17,8 @@ import TeaTest
 
 
 -- DATA
+
 -- Empty things
-
-
 emptyText : String
 emptyText =
     ""
@@ -366,9 +365,7 @@ countDescendents nodeType =
 
 
 
--- creates a keyed `ul` with `n` children (`li`).
-
-
+{-| creates a keyed `ul` with `n` children (`li`). -}
 keyedNodeWithChildren : Int -> Html.Html msg
 keyedNodeWithChildren childrenCount =
     let
@@ -380,9 +377,7 @@ keyedNodeWithChildren childrenCount =
 
 
 
--- creates a decoded keyed `ul` with `n` children (`li`).
-
-
+{-| creates a decoded keyed `ul` with `n` children (`li`). -}
 keyedNodeWithChildrenDecoded : Int -> NodeType
 keyedNodeWithChildrenDecoded childrenCount =
     let
@@ -403,9 +398,7 @@ keyedNodeWithChildrenDecoded childrenCount =
 
 
 
--- creates a keyed `ul` with `n` keyed children (`li`).
-
-
+{-| creates a keyed `ul` with `n` keyed children (`li`) -}
 keyedNodeWithKeyedChildren : Int -> Html.Html msg
 keyedNodeWithKeyedChildren childrenCount =
     let
