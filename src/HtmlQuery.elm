@@ -113,11 +113,12 @@ queryInNode selector node =
                         [ node ]
                     else
                         []
+
                 _ ->
                     []
+
         _ ->
             []
-
 
 
 predicateFromSelector : Selector -> (NodeRecord -> Bool)

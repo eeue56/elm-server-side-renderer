@@ -1,17 +1,15 @@
 module MarkdownTest exposing (..)
 
-
 import HtmlToString exposing (..)
 import ServerSide.InternalTypes exposing (..)
 import ServerSide.Helpers exposing (..)
 import ServerSide.Markdown exposing (..)
 import HtmlQuery exposing (..)
-import ElmTest exposing (..)
+import Legacy.ElmTest as ElmTest exposing (..)
 import Html
 import Html.Attributes exposing (id)
 import Markdown
 import Dict
-
 
 
 assertEqualPair : ( a, a ) -> Assertion
@@ -43,7 +41,8 @@ fullBlock =
 
 
 fullBlockAsString : String
-fullBlockAsString = """
+fullBlockAsString =
+    """
 # hello
 - one
 - two
@@ -57,9 +56,10 @@ fullBlockDecoded =
         { facts = emptyFacts
         , model =
             { baseMarkdownModel
-            | markdown = fullBlockAsString
+                | markdown = fullBlockAsString
             }
         }
+
 
 fullBlockWithAttrs : Html.Html msg
 fullBlockWithAttrs =
@@ -71,31 +71,28 @@ fullBlockWithAttrsDecoded =
     MarkdownNode
         { facts =
             { emptyFacts
-            | stringOthers = Dict.fromList [ ( "id", "noah" ) ]
-        }
+                | stringOthers = Dict.fromList [ ( "id", "noah" ) ]
+            }
         , model =
             { baseMarkdownModel
-            | markdown = fullBlockAsString
+                | markdown = fullBlockAsString
             }
         }
-
 
 
 nodeTests : Test
 nodeTests =
     suite "Node tests"
-        [ test "empty markdown are empty as a string"
-            <| assertEqualPair ( emptyBlockAsString, htmlToString emptyBlock)
-        , test "empty markdown are decoded to empty custom nodes"
-            <| assertEqualPair ( emptyBlockDecoded, nodeTypeFromHtml emptyBlock )
-
-        , test "full markdown are full as a string"
-            <| assertEqualPair ( fullBlockAsString, htmlToString fullBlock)
-        , test "full markdown are decoded to full custom nodes"
-            <| assertEqualPair ( fullBlockDecoded, nodeTypeFromHtml fullBlock )
-
-        , test "attributes have no effect on the model"
-            <| assertEqualPair ( fullBlockAsString, htmlToString fullBlockWithAttrs)
-        , test "markdown preserves attributes as facts"
-            <| assertEqualPair ( fullBlockWithAttrsDecoded, nodeTypeFromHtml fullBlockWithAttrs )
+        [ test "empty markdown are empty as a string" <|
+            assertEqualPair ( emptyBlockAsString, htmlToString emptyBlock )
+        , test "empty markdown are decoded to empty custom nodes" <|
+            assertEqualPair ( emptyBlockDecoded, nodeTypeFromHtml emptyBlock )
+        , test "full markdown are full as a string" <|
+            assertEqualPair ( fullBlockAsString, htmlToString fullBlock )
+        , test "full markdown are decoded to full custom nodes" <|
+            assertEqualPair ( fullBlockDecoded, nodeTypeFromHtml fullBlock )
+        , test "attributes have no effect on the model" <|
+            assertEqualPair ( fullBlockAsString, htmlToString fullBlockWithAttrs )
+        , test "markdown preserves attributes as facts" <|
+            assertEqualPair ( fullBlockWithAttrsDecoded, nodeTypeFromHtml fullBlockWithAttrs )
         ]

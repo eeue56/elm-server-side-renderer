@@ -1,11 +1,9 @@
-module HtmlToString exposing (..) -- where
+module HtmlToString exposing (..)
 
 import Html exposing (Html)
-
 import String
 import Dict exposing (Dict)
 import Json.Decode
-
 import ServerSide.Constants exposing (..)
 import ServerSide.Helpers exposing (..)
 import ServerSide.InternalTypes exposing (..)
@@ -15,7 +13,6 @@ emptyFacts : Facts
 emptyFacts =
     { styles = Dict.empty
     , events = Nothing
-    , attributes = Nothing
     , attributeNamespace = Nothing
     , stringOthers = Dict.empty
     , boolOthers = Dict.empty
@@ -31,12 +28,13 @@ nodeTypeFromHtml =
         >> Json.Decode.decodeString decodeNodeType
         >> Result.withDefault NoOp
 
+
 {-| Convert a node record to a string. This basically takes the tag name, then
     pulls all the facts into tag declaration, then goes through the children and
     nests them undert hsi one
 -}
 nodeRecordToString : NodeRecord -> String
-nodeRecordToString {tag, children, facts} =
+nodeRecordToString { tag, children, facts } =
     let
         openTag : List (Maybe String) -> String
         openTag extras =
@@ -48,7 +46,9 @@ nodeRecordToString {tag, children, facts} =
 
                 filling =
                     case trimmedExtras of
-                        [] -> ""
+                        [] ->
+                            ""
+
                         more ->
                             " " ++ (String.join " " more)
             in
@@ -63,10 +63,12 @@ nodeRecordToString {tag, children, facts} =
 
         styles =
             case Dict.toList facts.styles of
-                [] -> Nothing
+                [] ->
+                    Nothing
+
                 styles ->
                     styles
-                        |> List.map (\(key, value) -> key ++ ":" ++ value)
+                        |> List.map (\( key, value ) -> key ++ ":" ++ value)
                         |> String.join ""
                         |> (\styleString -> "style=\"" ++ styleString ++ "\"")
                         |> Just
@@ -78,13 +80,13 @@ nodeRecordToString {tag, children, facts} =
         stringOthers =
             Dict.filter (\k v -> k /= "className") facts.stringOthers
                 |> Dict.toList
-                |> List.map (\(k, v) -> k ++ "=\"" ++ v ++ "\"")
+                |> List.map (\( k, v ) -> k ++ "=\"" ++ v ++ "\"")
                 |> String.join " "
                 |> Just
 
         boolOthers =
             Dict.toList facts.boolOthers
-                |> List.map (\(k, v) -> k ++ "=" ++ (String.toLower <| toString v))
+                |> List.map (\( k, v ) -> k ++ "=" ++ (String.toLower <| toString v))
                 |> String.join " "
                 |> Just
 
@@ -95,25 +97,31 @@ nodeRecordToString {tag, children, facts} =
             , closeTag
             ]
 
+
 {-| Convert a given html node to a string based on the type
 -}
 nodeTypeToString : NodeType -> String
 nodeTypeToString nodeType =
     case nodeType of
-        TextTag {text} ->
+        TextTag { text } ->
             text
+
         NodeEntry record ->
             nodeRecordToString record
+
         CustomNode record ->
             ""
+
         MarkdownNode record ->
             record.model.markdown
+
         NoOp ->
             ""
+
 
 {-| Take a Html element, convert it to a string
 Useful for tests
 -}
 htmlToString : Html msg -> String
-htmlToString  =
+htmlToString =
     nodeTypeFromHtml >> nodeTypeToString

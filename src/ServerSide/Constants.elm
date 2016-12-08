@@ -1,4 +1,5 @@
-module ServerSide.Constants exposing (..) --where
+module ServerSide.Constants exposing (..)
+
 
 styleKey : String
 styleKey = "STYLE"
@@ -12,5 +13,7 @@ attributeKey = "ATTR"
 attributeNamespaceKey : String
 attributeNamespaceKey = "ATTR_NS"
 
+
 knownKeys : List String
-knownKeys = [ styleKey, eventKey, attributeKey, attributeNamespaceKey ]
+knownKeys =
+    [ styleKey, eventKey, attributeKey, attributeNamespaceKey ]
