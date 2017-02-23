@@ -96,9 +96,25 @@ function triggerEvent(eventName, value, node){
     return A2(_elm_lang$core$Native_Json.run, events[eventName].decoder, value)
 }
 
+function evaluateThunk(key, node) {
+    if (typeof node !== "undefined" && node.type === 'thunk') {
+        if (typeof node.node === "undefined") {
+            return node.thunk.apply(node, node.args);
+        } else {
+            return node.node;
+        }
+    } else {
+        return node;
+    }
+}
+
+function stringify(node) {
+    return JSON.stringify(node, evaluateThunk);
+}
+
 return {
     replaceChildren: replaceChildren,
-    stringify: JSON.stringify,
+    stringify: stringify,
     addAttribute: F2(addAttribute),
     triggerEvent: F3(triggerEvent)
 };

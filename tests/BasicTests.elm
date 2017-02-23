@@ -9,6 +9,7 @@ import Html
 import Html.Attributes
 import Html.Events
 import Html.Keyed as Keyed
+import Html.Lazy as Lazy
 import Dict
 import String
 import Json.Encode
@@ -226,6 +227,11 @@ oneChildDiv =
     Html.div [] [ Html.text nonEmptyText ]
 
 
+oneLazyChildDiv : Html.Html msg
+oneLazyChildDiv =
+    Html.div [] [ Lazy.lazy Html.text nonEmptyText ]
+
+
 oneChildDivAsString : String
 oneChildDivAsString =
     "<div>" ++ nonEmptyText ++ "</div>"
@@ -246,6 +252,11 @@ oneChildSpan =
     Html.span [] [ Html.text nonEmptyText ]
 
 
+oneLazyChildSpan : Html.Html msg
+oneLazyChildSpan =
+    Lazy.lazy (always <| Html.span [] [ Html.text nonEmptyText ]) 42
+
+
 oneChildSpanAsString : String
 oneChildSpanAsString =
     "<span>" ++ nonEmptyText ++ "</span>"
@@ -264,6 +275,11 @@ oneChildSpanDecoded =
 twoChildForm : Html.Html msg
 twoChildForm =
     Html.form [] [ oneChildDiv, oneChildSpan ]
+
+
+twoLazyChildForm : Html.Html msg
+twoLazyChildForm =
+    Lazy.lazy (always <| Html.form [] [ oneLazyChildDiv, oneLazyChildSpan ]) 42
 
 
 twoChildFormAsString : String
@@ -440,6 +456,8 @@ nodeTests =
             assertEqualPair ( emptyDivWithAddedAttributeDecoded, nodeTypeFromHtml emptyDivWithAddedAttribute )
         , test "empty keyed ul is decoded to empty ul node" <|
             assertEqualPair ( emptyKeyedUlDecoded, nodeTypeFromHtml emptyKeyedNode )
+        , test "empty lazy divs are empty divs as a string" <|
+            assertEqualPair ( emptyDivAsString, htmlToString (Lazy.lazy (\_ -> emptyDiv) 1) )
         , test "empty divs with classes get classes as a string" <|
             assertEqualPair ( emptyDivWithAttributeAsString, htmlToString emptyDivWithAttribute )
         , test "empty divs with classes are decoded to empty div nodes with classes" <|
@@ -454,6 +472,8 @@ nodeTests =
             assertEqualPair ( emptyDivWithStyleDecoded, nodeTypeFromHtml emptyDivWithStyle )
         , test "divs with one non-empty text node are just a div with text" <|
             assertEqualPair ( oneChildDivAsString, htmlToString oneChildDiv )
+        , test "divs with one non-empty lazy text node are just a div with text" <|
+            assertEqualPair ( oneChildDivAsString, htmlToString oneLazyChildDiv )
         , test "divs with one non-empty text node are decoded to just a div with text" <|
             assertEqualPair ( oneChildDivDecoded, nodeTypeFromHtml oneChildDiv )
         , test "spans with one non-empty text node are just a span with text" <|
@@ -462,6 +482,8 @@ nodeTests =
             assertEqualPair ( oneChildSpanDecoded, nodeTypeFromHtml oneChildSpan )
         , test "forms with two non-empty text children are just a form with text" <|
             assertEqualPair ( twoChildFormAsString, htmlToString twoChildForm )
+        , test "lazy forms with two non-empty lazy text children are just a form with text" <|
+            assertEqualPair ( twoChildFormAsString, htmlToString twoLazyChildForm )
         , test "forms with two non-empty text children are decoded to just a form with text" <|
             assertEqualPair ( twoChildFormDecoded, nodeTypeFromHtml twoChildForm )
         , test "ul with a child text node" <|
