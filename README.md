@@ -1,6 +1,5 @@
 # elm-server-side-renderer
 
-## Work in process!
 
 Take a `Html msg` element and turn it into a string.
 
